@@ -64,8 +64,8 @@ int dump(){
 %}
 /* states */
 %x	STATE_string
-%x 	COMMET_Single
-%x	COMMET_Multi
+%x 	COMMET_Cpp
+%x	COMMET_C
 
 /*Definitions*/
 digs         [0-9]
@@ -75,6 +75,7 @@ expreal      {digs}"."{digs}[Ee][+-]?{digs}
 real         {plainreal}|{expreal}
 letter       [a-zA-Z]
 identifier   {letter}({digs}|{letter})*
+string	     [0-9a-zA-Z]*
 whitespace   [ \t]+
 %%
 
@@ -143,7 +144,8 @@ whitespace   [ \t]+
 {identifier}  	{tokenId;}
 {integer}     	{tokenInteger;}
 {real}        	{tokenReal;}
-\"		{
+
+\"		  {
                     LIST;
                     BEGIN STATE_string;
                   }
@@ -168,33 +170,33 @@ whitespace   [ \t]+
                       LIST;
                       strcat(str,yytext);
                     }
-"//"          		{
+"%"          		{
                		LIST;
-                	BEGIN COMMET_Single;
+                	BEGIN COMMET_Cpp;
             		}
-<COMMET_Single>\n 	{
+<COMMET_Cpp>\n 	{
                       LIST;
                       printf("%d: %s", line_num++, buf);
                       buf[0] = '\0';
                       BEGIN 0;
                     }
-<COMMET_Single>.    {
+<COMMET_Cpp>.    {
                       LIST;
                     }
-"/*"               {
+"{%"               {
                       LIST;
-                      BEGIN COMMET_Multi;
+                      BEGIN COMMET_C;
                     }
-<COMMET_Multi>\n {
+<COMMET_C>\n {
                       LIST;
                       printf("%d: %s", line_num++, buf);
                       buf[0] = '\0';
                      	}
-<COMMET_Multi>"*/"	{
+<COMMET_C>"%}"	{
                       		LIST;
                       		BEGIN 0;
                     	}
-<COMMET_Multi>.     {
+<COMMET_C>.     {
                       		LIST;
                     	}
 \n 			{
