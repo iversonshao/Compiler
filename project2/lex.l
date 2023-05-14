@@ -6,17 +6,17 @@
 #include "union.h"
 #include "yacc.tab.h"
 
-#define MAX_LINE_LENG 	256
-#define LIST		strcat(buf,yytext)
-#define token(t) 	{LIST; printf("<'%s'>\n",t);}
-#define tokenId		{insert(yytext);LIST; printf("<%s:%s>\n","id",yytext);}
-#define tokenInteger 	{LIST; printf("<%s:%d>\n","int", yytext);}
-#define tokenFloat(t)   {LIST; printf("<%s:%d>\n","float" yytext)}
-#define tokenReal	{LIST; printf("<%s:%s>\n","real", yytext);}
-#define tokenBoolean	{LIST; printf("<%s:%s>\n","boolean",yytext);}
-#define tokenString(t,s){LIST; printf("<%s:%s>\n","string",str);}
-#define capital(t) 	{ for(int i = 0; i < strlen(t); i++){t[i] = toupper(t[i]);};printf("<%s>\n", t); }
-#define keyword(t)	{LIST; capital(t)}
+#define MAX_LINE_LENG 		256
+#define LIST			strcat(buf,yytext)
+#define token(s,t) 		{LIST; printf("<%s>\n", s); return(t);}
+#define tokenId			{insert(yytext);LIST; printf("<%s:%s>\n","id",yytext);}
+#define tokenInteger(s,t) 	{LIST; printf("<%s:%d>\n","int", yytext);}
+#define tokenFloat(t)   	{LIST; printf("<%s:%d>\n","float" yytext)}
+#define tokenReal		{LIST; printf("<%s:%s>\n","real", yytext);}
+#define tokenBoolean		{LIST; printf("<%s:%s>\n","boolean",yytext);}
+#define tokenString(s,t)	{LIST; printf("<%s:%s>\n","string",str);}
+#define capitals(t) 		{ for(int i = 0; i < strlen(t); i++){t[i] = toupper(t[i]);};printf("<%s>\n", t); }
+#define keyword(t)		{LIST; capitals(t)}
 
 int 	line_num = 1;
 char 	buf[MAX_LINE_LENG];
@@ -65,7 +65,7 @@ whitespace   [ \t]+
 "if"		{keyword(yytext); return IF;}
 "int" 		{keyword(yytext); return INT;}
 "loop" 		{keyword(yytext); return LOOP;}
-"of" 		{keyword(yytext); return of;}
+"of" 		{keyword(yytext); return OF;}
 "put" 		{keyword(yytext); return PUT;}
 "procedure" 	{keyword(yytext); return PROCEDURE;}
 "real" 		{keyword(yytext); return REAL;}
