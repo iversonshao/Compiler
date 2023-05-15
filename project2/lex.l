@@ -4,27 +4,25 @@
 #include <ctype.h>
 #include <string.h>
 #include "union.h"
-#include "yacc.tab.h"
+#include "y.tab.h"
 
 #define MAX_LINE_LENG 		256
 #define LIST			strcat(buf,yytext)
 #define token(s,t) 		{LIST; printf("<%s>\n", s); return(t);}
 #define tokenId			{insert(yytext);LIST; printf("<%s:%s>\n","id",yytext);}
-#define tokenInteger(s,t) 	{LIST; printf("<%s:%d>\n","int", yytext);}
-#define tokenFloat(t)   	{LIST; printf("<%s:%d>\n","float" yytext)}
-#define tokenReal		{LIST; printf("<%s:%s>\n","real", yytext);}
+#define tokenInteger(s,t) 	{LIST; printf("<%s:%d>\n","int", yytext);return(t);}
+#define tokenReal(s,t)   	{LIST; printf("<%s:%d>\n","real" yytext);return(t);}
 #define tokenBoolean		{LIST; printf("<%s:%s>\n","boolean",yytext);}
-#define tokenString(s,t)	{LIST; printf("<%s:%s>\n","string",str);}
+#define tokenString(s,t)	{LIST; printf("<%s:%s>\n","string",str);return(t);}
 #define capitals(t) 		{ for(int i = 0; i < strlen(t); i++){t[i] = toupper(t[i]);};printf("<%s>\n", t); }
 #define keyword(t)		{LIST; capitals(t)}
 
 int 	line_num = 1;
 char 	buf[MAX_LINE_LENG];
-char 	str[1000];
+char 	strbuf[MAX_LINE_LENG];
 
 int yywarp(void);
 int yylex(void);
-
 
 %}
 /* states */
@@ -35,7 +33,6 @@ int yylex(void);
 /*Definitions*/
 digs         [0-9]
 integer      {digs}+
-float        -?(([0-9]+)|([0-9]*\.[0-9]+)([eE][-+]?[0-9]+)?)
 plainreal    {digs}"."{digs}
 expreal      {digs}"."{digs}[Ee][+-]?{digs}		
 real         {plainreal}|{expreal}
@@ -45,7 +42,6 @@ string	     [0-9a-zA-Z]*
 whitespace   [ \t]+
 %%
 
- /*rules*/
  /* keyword */
 
 "array"		{keyword(yytext); return ARRAY;}
@@ -76,8 +72,8 @@ whitespace   [ \t]+
 "then" 		{keyword(yytext); return THEN;}
 "var" 		{keyword(yytext); return VAR;}
 "when" 		{keyword(yytext); return WHEN;}
-"false" 	{tokenBoolean; yylval.m_nInt = 0; return FALSEVAL;}
-"true"		{tokenBoolean; yylval.m_nInt = 1; return TUREVAL;}
+"false" 	{tokenBoolean; ylval.m_nInt = 0; return FALSEVAL;}
+"true"		{tokenBoolean; ylval.m_nInt = 1; return TUREVAL;}
 
 "(" 		{token("("); return LP;}
 ")" 		{token(")"); return RP;}
@@ -107,7 +103,7 @@ whitespace   [ \t]+
 "and"		{token("and"); return AND;}
 "or"		{token("or"); return OR;}
 "not"		{token("not"); return NOT;}
-{{identifier}  {
+{identifier}  {
               strcpy(yylval.m_sId , yytext);
               tokenId(yylval.m_sId);
               return IDENTIFIER;
@@ -118,10 +114,10 @@ whitespace   [ \t]+
               
               return INTEGERVAL;
               }
-{float}       {
-              yylval.m_float=atof(yytext);
-              tokenFloat(yylval.m_float);
-              return FLOATVAL;
+{real}       {
+              yylval.m_real=atof(yytext);
+              tokenReal(yylval.m_real);
+              return REALVAL;
               }
 
 \"		  {
@@ -130,7 +126,7 @@ whitespace   [ \t]+
                   }
 
 <STATE_string>\"  {
-                      char c = input();
+                      char c = yyinput();
                       if(c=='\"')
                     {
                       LIST;
@@ -141,7 +137,7 @@ whitespace   [ \t]+
                     {
                       tokenString("string",str);
                       unput(c);
-                      str[0] = '\0';
+                      strbuf[0] = '\0';
                       BEGIN 0;
                       return STRINGVAL;
                     }
