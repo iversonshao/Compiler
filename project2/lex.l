@@ -4,7 +4,7 @@
 #include <ctype.h>
 #include <string.h>
 #include "union.h"
-#include "y.tab.h"
+#include "sT.tab.h"
 
 #define MAX_LINE_LENG 		256
 #define LIST			strcat(buf,yytext)
