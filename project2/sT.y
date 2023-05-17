@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include "union.h"
+#define Trace(t)        printf(t)
 
 int yylex(void);
 void yyerror(const char *s);
@@ -18,83 +19,83 @@ struct content{
 };
 
 struct content symbolTable[256][256];
-int id_total=0;
+int id_total = 0;
 int scope = 0;
 int isShouldAdd = 0;
 
 int insert(struct content a){
 	bool inSymbolTable = false ;
 	for(int i = 0 ; i < id_total; i++){
-		if(strcmp(a.id, symbolTable[scope][i].id)==0){
+		if(strcmp(a.id, symbolTable[scope][i].id) == 0){
 			inSymbolTable = true ;
 		}
 	}
 	if (!inSymbolTable){
-		if(strcmp("int",a.type)==0){
-			if(strcmp("arrays",a.bigtype)==0){
-			strcpy(symbolTable[scope][id_total].id,a.id);
-			strcpy(symbolTable[scope][id_total].type,a.type);
-			strcpy(symbolTable[scope][id_total].bigtype,a.bigtype);
+		if(strcmp("int",a.type) == 0){
+			if(strcmp("arrays" ,a.bigtype) == 0){
+			strcpy(symbolTable[scope][id_total].id ,a.id);
+			strcpy(symbolTable[scope][id_total].type ,a.type);
+			strcpy(symbolTable[scope][id_total].bigtype ,a.bigtype);
 			id_total++;
 			}
 			else{
-			strcpy(symbolTable[scope][id_total].id,a.id);
+			strcpy(symbolTable[scope][id_total].id ,a.id);
 			symbolTable[scope][id_total].ival = a.ival;
-			strcpy(symbolTable[scope][id_total].type,a.type);
-			strcpy(symbolTable[scope][id_total].bigtype,a.bigtype);
+			strcpy(symbolTable[scope][id_total].type ,a.type);
+			strcpy(symbolTable[scope][id_total].bigtype ,a.bigtype);
 			id_total++;
 			}
 		}
-		else if(strcmp("real",a.type)==0){
-			if(strcmp("arrays",a.bigtype)==0){
-			strcpy(symbolTable[scope][id_total].id,a.id);
-			strcpy(symbolTable[scope][id_total].type,a.type);
-			strcpy(symbolTable[scope][id_total].bigtype,a.bigtype);
+		else if(strcmp("real" ,a.type) == 0){
+			if(strcmp("arrays" ,a.bigtype) == 0){
+			strcpy(symbolTable[scope][id_total].id ,a.id);
+			strcpy(symbolTable[scope][id_total].type ,a.type);
+			strcpy(symbolTable[scope][id_total].bigtype ,a.bigtype);
 			id_total++;
 			}
 			else{
-			strcpy(symbolTable[scope][id_total].id,a.id);
+			strcpy(symbolTable[scope][id_total].id ,a.id);
 			symbolTable[scope][id_total].rval = a.rval;
-			strcpy(symbolTable[scope][id_total].type,a.type);
-			strcpy(symbolTable[scope][id_total].bigtype,a.bigtype);
+			strcpy(symbolTable[scope][id_total].type ,a.type);
+			strcpy(symbolTable[scope][id_total].bigtype ,a.bigtype);
 			id_total++;
 			}
 		}
-		else if(strcmp("string",a.type)==0){
-			if(strcmp("arrays",a.bigtype)==0){
-			strcpy(symbolTable[scope][id_total].id,a.id);
-			strcpy(symbolTable[scope][id_total].type,a.type);
-			strcpy(symbolTable[scope][id_total].bigtype,a.bigtype);
+		else if(strcmp("string",a.type) == 0){
+			if(strcmp("arrays" ,a.bigtype) == 0){
+			strcpy(symbolTable[scope][id_total].id ,a.id);
+			strcpy(symbolTable[scope][id_total].type ,a.type);
+			strcpy(symbolTable[scope][id_total].bigtype ,a.bigtype);
 			id_total++;
 			}
 			else{
-			strcpy(symbolTable[scope][id_total].id,a.id);
-			strcpy(symbolTable[scope][id_total].sval,a.sval);
-			strcpy(symbolTable[scope][id_total].type,a.type);
-			strcpy(symbolTable[scope][id_total].bigtype,a.bigtype);
+			strcpy(symbolTable[scope][id_total].id ,a.id);
+			strcpy(symbolTable[scope][id_total].sval ,a.sval);
+			strcpy(symbolTable[scope][id_total].type ,a.type);
+			strcpy(symbolTable[scope][id_total].bigtype ,a.bigtype);
 			id_total++;
 			}
 		}
-		else if(strcmp("bool",a.type)==0){
-			if(strcmp("arrays",a.bigtype)==0){
-			strcpy(symbolTable[scope][id_total].id,a.id);
-			strcpy(symbolTable[scope][id_total].type,a.type);
-			strcpy(symbolTable[scope][id_total].bigtype,a.bigtype);
+		else if(strcmp("bool",a.type) == 0){
+			if(strcmp("arrays",a.bigtype) == 0){
+			strcpy(symbolTable[scope][id_total].id ,a.id);
+			strcpy(symbolTable[scope][id_total].type ,a.type);
+			strcpy(symbolTable[scope][id_total].bigtype ,a.bigtype);
 			id_total++;
 			}
 			else{
-			strcpy(symbolTable[scope][id_total].id,a.id);
-			strcpy(symbolTable[scope][id_total].type,a.type);
+			strcpy(symbolTable[scope][id_total].id ,a.id);
+			strcpy(symbolTable[scope][id_total].type ,a.type);
 			symbolTable[scope][id_total].bval = a.bval;
-			strcpy(symbolTable[scope][id_total].bigtype,a.bigtype);
+			strcpy(symbolTable[scope][id_total].bigtype ,a.bigtype);
 			id_total++;
 			}
 		}
 		else{
-			strcpy(symbolTable[scope][id_total].id,a.id);
-			strcpy(symbolTable[scope][id_total].type,a.type);
+			strcpy(symbolTable[scope][id_total].id ,a.id);
+			strcpy(symbolTable[scope][id_total].type ,a.type);
 			symbolTable[scope][id_total].ival = a.ival;
-			strcpy(symbolTable[scope][id_total].bigtype,a.bigtype);
+			strcpy(symbolTable[scope][id_total].bigtype ,a.bigtype);
 
 		}
 	}
@@ -102,9 +103,9 @@ int insert(struct content a){
 
 int lookup(char *c){
 	for (int i = 0; i <= scope; i++){
-		for(int j=0;j<=id_total;j++){
-			if (strcmp(c , symbolTable[i][j].id)==0){			
-				if(strcmp(symbolTable[i][j].type,"int")==0){
+		for(int j = 0; j <= id_total; j++){
+			if (strcmp(c ,symbolTable[i][j].id) == 0){			
+				if(strcmp(symbolTable[i][j].type, "int") == 0){
 					return symbolTable[i][j].ival;
 				}
 				else{
@@ -119,47 +120,47 @@ int lookup(char *c){
 
 int dump(){
 	for (int i = 0; i <= scope; i++){
-		for (int j=0; j <= id_total ;j++){
-			if(strcmp("int",symbolTable[i][j].type)==0){
-				if(strcmp("arrays",symbolTable[i][j].bigtype)==0){
-					printf("%-*s\t%-*s\t%-*s\t%-*s\t%-*d\n",10,symbolTable[i][j].id,10,symbolTable[i][j].type,10,symbolTable[i][j].bigtype,10," ",10,i);
+		for (int j=0; j <= id_total; j++){
+			if(strcmp("int",symbolTable[i][j].type) == 0){
+				if(strcmp("arrays", symbolTable[i][j].bigtype) == 0){
+					printf("%-*s\t%-*s\t%-*s\t%-*s\t%-*d\n", 10, symbolTable[i][j].id, 10, symbolTable[i][j].type, 10, symbolTable[i][j].bigtype, 10, " ", 10, i);
 				}
 				else{
-					printf("%-*s\t%-*s\t%-*s\t%-*d\t%-*d\n",10,symbolTable[i][j].id,10,symbolTable[i][j].type,10,symbolTable[i][j].bigtype,10,symbolTable[i][j].ival,10,i);
+					printf("%-*s\t%-*s\t%-*s\t%-*d\t%-*d\n", 10, symbolTable[i][j].id, 10, symbolTable[i][j].type, 10, symbolTable[i][j].bigtype, 10, symbolTable[i][j].ival, 10, i);
 				}
 			}
-			else if(strcmp("real",symbolTable[i][j].type)==0){
-				if(strcmp("arrays",symbolTable[i][j].bigtype)==0){
-					printf("%-*s\t%-*s\t%-*s\t%-*s\t%-*d\n",10,symbolTable[i][j].id,10,symbolTable[i][j].type,10,symbolTable[i][j].bigtype,10," ",10,i);
+			else if(strcmp("real", symbolTable[i][j].type) == 0){
+				if(strcmp("arrays", symbolTable[i][j].bigtype) == 0){
+					printf("%-*s\t%-*s\t%-*s\t%-*s\t%-*d\n", 10, symbolTable[i][j].id, 10, symbolTable[i][j].type, 10, symbolTable[i][j].bigtype, 10, " ", 10, i);
 				}
 				else{
-					printf("%-*s\t%-*s\t%-*s\t%-*f\t%-*d\n",10,symbolTable[i][j].id,10,symbolTable[i][j].type,10,symbolTable[i][j].bigtype,10,symbolTable[i][j].rval,10,i);
+					printf("%-*s\t%-*s\t%-*s\t%-*f\t%-*d\n", 10, symbolTable[i][j].id, 10, symbolTable[i][j].type, 10, symbolTable[i][j].bigtype, 10, symbolTable[i][j].rval, 10, i);
 				}
 			}
-			else if(strcmp("string",symbolTable[i][j].type)==0){
-				if(strcmp("arrays",symbolTable[i][j].bigtype)==0){
-					printf("%-*s\t%-*s\t%-*s\t%-*s\t%-*d\n",10,symbolTable[i][j].id,10,symbolTable[i][j].type,10,symbolTable[i][j].bigtype,10," ",10,i);
+			else if(strcmp("string", symbolTable[i][j].type) == 0){
+				if(strcmp("arrays", symbolTable[i][j].bigtype) == 0){
+					printf("%-*s\t%-*s\t%-*s\t%-*s\t%-*d\n", 10, symbolTable[i][j].id, 10, symbolTable[i][j].type, 10, symbolTable[i][j].bigtype, 10, " ", 10, i);
 				}
 				else{
-					printf("%-*s\t%-*s\t%-*s\t%-*s\t%-*d\n",10,symbolTable[i][j].id,10,symbolTable[i][j].type,10,symbolTable[i][j].bigtype,10,symbolTable[i][j].sval,10,i);
+					printf("%-*s\t%-*s\t%-*s\t%-*s\t%-*d\n", 10, symbolTable[i][j].id, 10, symbolTable[i][j].type, 10, symbolTable[i][j].bigtype, 10, symbolTable[i][j].sval, 10, i);
 				}
 			}
-			else if(strcmp("bool",symbolTable[i][j].type)==0){
-				if(strcmp("arrays",symbolTable[i][j].bigtype)==0){
-					printf("%-*s\t%-*s\t%-*s\t%-*s\t%-*d\n",10,symbolTable[i][j].id,10,symbolTable[i][j].type,10,symbolTable[i][j].bigtype,10," ",10,i);
+			else if(strcmp("bool", symbolTable[i][j].type) == 0){
+				if(strcmp("arrays", symbolTable[i][j].bigtype) == 0){
+					printf("%-*s\t%-*s\t%-*s\t%-*s\t%-*d\n", 10, symbolTable[i][j].id, 10, symbolTable[i][j].type, 10, symbolTable[i][j].bigtype, 10, " ", 10, i);
 
 				}
 				else{
-					if(symbolTable[i][j].bval==0){
-						printf("%-*s\t%-*s\t%-*s\t%-*s\t%-*d\n",10,symbolTable[i][j].id,10,symbolTable[i][j].type,10,symbolTable[i][j].bigtype,10,"False",10,i);
+					if(symbolTable[i][j].bval == 0){
+						printf("%-*s\t%-*s\t%-*s\t%-*s\t%-*d\n", 10, symbolTable[i][j].id, 10, symbolTable[i][j].type, 10, symbolTable[i][j].bigtype, 10, "False", 10, i);
 					}
-					else if(symbolTable[i][j].bval==1){
-						printf("%-*s\t%-*s\t%-*s\t%-*s\t%-*d\n",10,symbolTable[i][j].id,10,symbolTable[i][j].type,10,symbolTable[i][j].bigtype,10,"True",10,i);
+					else if(symbolTable[i][j].bval == 1){
+						printf("%-*s\t%-*s\t%-*s\t%-*s\t%-*d\n" , 10, symbolTable[i][j].id, 10, symbolTable[i][j].type, 10, symbolTable[i][j].bigtype, 10, "True", 10, i);
 					}
 				}
 			}
-			else if(strcmp("null",symbolTable[i][j].type)==0){
-				printf("%-*s\t%-*s\t%-*s\t%-*s\t%-*d\n",10,symbolTable[i][j].id,10," ",10,symbolTable[i][j].bigtype,10," ",10,i);
+			else if(strcmp("null", symbolTable[i][j].type) == 0){
+				printf("%-*s\t%-*s\t%-*s\t%-*s\t%-*d\n", 10, symbolTable[i][j].id, 10, " ", 10, symbolTable[i][j].bigtype, 10, " ", 10, i);
 			}
 			else{
 
@@ -185,14 +186,14 @@ int dump(){
 %token LP RP DOT COMMA COLON SEMICOLON LSB RSB LCB RCB ADDITION SUBTRACTION MULTIPLICATION DIVISION REMAINDER ASSIGNMENT LT LE GE GT EQ NOTE AND OR NOT
 %token BEGIN CHAR DECREASING DEFAULT DO ELSE END EXIT FOR FUNCTION GET IF LOOP OF PUT PROCEDURE RESULT RETURN SKIP THEN WHEN FALSE TRUE
 
-%token<type> BOOL REAL INT STRING VAR ARRAY CONST
+%token<type>BOOL REAL INT STRING VAR ARRAY CONST
 
-%token<m_sId> 	IDENTIFIER
-%token<m_nInt> 	INTEGERVAL
-%token<m_str> 	STRINGVAL
-%token<m_real>	REALVAL
-%token<m_nInt>	TRUEVAL
-%token<m_nInt>	FALSEVAL
+%token<m_sId>IDENTIFIER
+%token<m_nInt>INTEGERVAL
+%token<m_str>STRINGVAL
+%token<m_real>REALVAL
+%token<m_nInt>TRUEVAL
+%token<m_nInt>FALSEVAL
 
 %left OR
 %left AND
@@ -213,7 +214,7 @@ program:	external_declaration {printf("%s\n","Reducing to [program]");}
 	;    
 
 external_declaration:	function_definition{printf("%s\n","Reducing to [external_declaration]");}
-	|		procedures_definition{printf("%s\n","Reducing to [external_declaration]");}
+	|		procedure_definition{printf("%s\n","Reducing to [external_declaration]");}
 	| 		declaration_list{printf("%s\n","Reducing to [external_declaration]");}
 	| 		IDENTIFIER LP func_inv_list RP{printf("%s\n","Reducing to [external_declaration]");}
 	| 		simple_statment{printf("%s\n","Reducing to [external_declaration]");}
@@ -225,7 +226,7 @@ func_expression : FUNCTION{
 		| PROCEDURE{
 			isShouldAdd = 0;
 			scope++;
-			printf("%s\n","Reducing to [func_expression]");}
+			printf("%s\n","Reducing to [procedure_expression]");}
 		;
 
 function_definition: func_expression IDENTIFIER LP RP COLON type_specifier block_statement{
@@ -237,17 +238,17 @@ function_definition: func_expression IDENTIFIER LP RP COLON type_specifier block
 			insert(a);
 			scope++;
 			printf("%s\n","Reducing to [function_definition]");}
-	| 	     func_expression IDENTIFIER LP value_declaration COLON type_specifier RP COLON type_specifier block_statement{
+		  |  func_expression IDENTIFIER LP value_declaration COLON type_specifier RP COLON type_specifier block_statement{
 			struct content a;
 			strcpy(a.id,$2);
 			strcpy(a.bigtype,"function");
-			strcpy(a.type,$9);
+			strcpy(a.type,type_specifier);
 			a.ival = 0;
 			insert(a);
 			scope++;
 			printf("%s\n","Reducing to [function_definition]");}
 	;
-procedures_definition:  func_expression IDENTIFIER LP RP block_statement{
+procedure_definition:  func_expression IDENTIFIER LP RP block_statement{
 			struct content a;
 			strcpy(a.id,$2);
 			strcpy(a.bigtype,"procedures");
@@ -255,10 +256,18 @@ procedures_definition:  func_expression IDENTIFIER LP RP block_statement{
 			strcpy(a.sval,"null");
 			insert(a);
 			scope++;
-			printf("%s\n","Reducing to [procedures_definition]");}
+			printf("%s\n","Reducing to [procedure_definition]");}
 	;
 
-block_start :{
+block_start :" "{
+			if (isShouldAdd == 1){		
+				scope++;
+			}
+			else{
+				isShouldAdd++;
+			}
+			printf("%s\n","Reducing to [block_start]");}
+	    | BEGIN{
 			if (isShouldAdd == 1){		
 				scope++;
 			}
@@ -269,6 +278,9 @@ block_start :{
 	    ;
 
 block_end : END IDENTIFIER{
+			scope--;
+			printf("%s\n","Reducing to [block_end]");}
+	  |END {
 			scope--;
 			printf("%s\n","Reducing to [block_end]");}
 	  ;
@@ -297,7 +309,7 @@ declaration:
 			a.rval = $4.uval.rval;
 			}
 			else if($4.type == 2){
-			strcpy(a.type,"string");
+			strcpy(a.type,"str");
 			strcpy(a.sval,$4.uval.sval);
 			}
 			else if($4.type == 3){
@@ -323,7 +335,7 @@ declaration:
 			a.rval = $6.uval.rval;
 			}
 			else if($6.type == 2){
-			strcpy(a.type,"string");
+			strcpy(a.type,"str");
 			strcpy(a.sval,$6.uval.sval);
 			}
 			else if($6.type == 3){
@@ -349,7 +361,7 @@ declaration:
 			a.rval = $4.uval.rval;
 			}
 			else if($4.type == 2){
-			strcpy(a.type,"string");
+			strcpy(a.type,"str");
 			strcpy(a.sval,$4.uval.sval);
 			}
 			else if($4.type == 3){
@@ -367,16 +379,16 @@ declaration:
 			strcpy(a.id,$2);
 			strcpy(a.bigtype,"array");
 			if(strcmp("int",$5) == 0){
-			strcpy(a.type,"int");
+				strcpy(a.type,"int");
 			}
 			else if(strcmp("real",$5) == 0){
-			strcpy(a.type,"real");
+				strcpy(a.type,"real");
 			}
-			else if(strcmp("string",$5)==0){
-			strcpy(a.type,"string");
+			else if(strcmp("str",$5)==0){
+				strcpy(a.type,"str");
 			}
 			else if(strcmp("bool",$5)==0){
-			strcpy(a.type,"bool");
+				strcpy(a.type,"bool");
 			}
 			insert(a);
 			printf("%s\n","Reducing to [declaration]");}
@@ -447,7 +459,7 @@ multiplicative_expression: unary_expression{printf("%s\n","Reducing to [multipli
 		}
 	| 		  multiplicative_expression REMAINDER unary_expression
 		{
-			$$ = $1 mod $3;
+			$$ = $1 % $3;
 			printf("%s\n","Reducing to [multiplicative_expression]");
 
 		}
@@ -505,7 +517,7 @@ type_specifier: BOOL{
 			printf("%s\n","Reducing to [type_specifier]");
 		}
 	| 	STRING{
-			strcpy($$,"string");
+			strcpy($$,"str");
 			printf("%s\n","Reducing to [type_specifier]");
 		}
 	| 	REAL{
@@ -533,9 +545,6 @@ parameter_declaration: IDENTIFIER COLON type_specifier{
 			printf("%s\n","Reducing to [parameter_declaration]");
 		}
 	;
-
-blocks_statment: BEGIN END{printf("%s\n","Reducing to [blocks_statment]");}
-	;
 	
 simple_statment: IDENTIFIER ASSIGNMENT expression{printf("%s\n","Reducing to [simple_statment]");}
 	| PUT expression{printf("%s\n","Reducing to [simple_statment]");}
@@ -551,12 +560,12 @@ simple_statment: IDENTIFIER ASSIGNMENT expression{printf("%s\n","Reducing to [si
 expression_statement:expression{printf("%s\n","Reducing to [expression_statement]");}
 	;
 
-selection_statement: IF expression THEN statement ELSE statement END IF{printf("%s\n","Reducing to [selection_statment]");}
-	| 	     IF expression THEN statement END IF{printf("%s\n","Reducing to [selection_statment]");}
+selection_statement: IF expression THEN statement ELSE statement{printf("%s\n","Reducing to [selection_statment]");}
+	| 	     IF expression THEN statement{printf("%s\n","Reducing to [selection_statment]");}
 	;
 
-iteration_statement: LOOP statement END LOOP{printf("%s\n","Reducing to [iteration_statment]");}
-	|	     FOR IDENTIFIER COLON expression DOT DOT expression END FOR{printf("%s\n","Reducing to [iteration_statment]");}	
+iteration_statement: LOOP statement {printf("%s\n","Reducing to [iteration_statment]");}
+	|	     FOR IDENTIFIER COLON expression DOT DOT expression{printf("%s\n","Reducing to [iteration_statment]");}	
 	;
 
 statement_list
@@ -580,6 +589,7 @@ statement
 	;
 
 %%
+
 void yyerror(const char *s)
 {
 	printf("%s\n",s);
