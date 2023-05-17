@@ -8,18 +8,18 @@
 
 #define MAX_LINE_LENG 		256
 #define LIST			strcat(buf,yytext)
-#define token(s,t) 		{LIST; printf("<%s>\n", s); return(t);}
-#define tokenId			{insert(yytext);LIST; printf("<%s:%s>\n","id",yytext);}
-#define tokenInteger(s,t) 	{LIST; printf("<%s:%d>\n","int", yytext);return(t);}
-#define tokenReal(s,t)   	{LIST; printf("<%s:%d>\n","real" yytext);return(t);}
+#define token(t) 		{LIST; printf("<%s>\n", yytext);}
+#define tokenId			{LIST; printf("<%s:%s>\n","id",yytext);}
+#define tokenInteger 		{LIST; printf("<%s:%d>\n","int", yytext);}
+#define tokenReal(t)   		{LIST; printf("<%s:%f>\n","real", yytext);}
 #define tokenBoolean		{LIST; printf("<%s:%s>\n","boolean",yytext);}
-#define tokenString(s,t)	{LIST; printf("<%s:%s>\n","string",str);return(t);}
+#define tokenString(t)		{LIST; printf("<%s:%s>\n","string",str);}
 #define capitals(t) 		{ for(int i = 0; i < strlen(t); i++){t[i] = toupper(t[i]);};printf("<%s>\n", t); }
 #define keyword(t)		{LIST; capitals(t)}
 
 int 	line_num = 1;
 char 	buf[MAX_LINE_LENG];
-char 	strbuf[MAX_LINE_LENG];
+char 	str[1000];
 
 int yywarp(void);
 int yylex(void);
@@ -38,7 +38,7 @@ expreal      {digs}"."{digs}[Ee][+-]?{digs}
 real         {plainreal}|{expreal}
 letter       [a-zA-Z]
 identifier   {letter}+({digs}|{letter})*
-string	     [0-9a-zA-Z]*
+string	     [0-9a-zA-Z]*"”"[0-9a-zA-Z]*
 whitespace   [ \t]+
 %%
 
@@ -56,7 +56,7 @@ whitespace   [ \t]+
 "end" 		{keyword(yytext); return END;}
 "exit" 		{keyword(yytext); return EXIT;}
 "for" 		{keyword(yytext); return FOR;}
-"function" 	{keyword(yytext); return FUNCUTION;}
+"function" 	{keyword(yytext); return FUNCTION;}
 "get" 		{keyword(yytext); return GET;}
 "if"		{keyword(yytext); return IF;}
 "int" 		{keyword(yytext); return INT;}
@@ -73,7 +73,7 @@ whitespace   [ \t]+
 "var" 		{keyword(yytext); return VAR;}
 "when" 		{keyword(yytext); return WHEN;}
 "false" 	{tokenBoolean; ylval.m_nInt = 0; return FALSEVAL;}
-"true"		{tokenBoolean; ylval.m_nInt = 1; return TUREVAL;}
+"true"		{tokenBoolean; ylval.m_nInt = 1; return TRUEVAL;}
 
 "(" 		{token("("); return LP;}
 ")" 		{token(")"); return RP;}
@@ -108,7 +108,7 @@ whitespace   [ \t]+
               tokenId(yylval.m_sId);
               return IDENTIFIER;
               }
-{integer} 	{
+{integer}     {
               yylval.m_nInt=atoi(yytext);
               tokenInteger(yylval.m_nInt);
               
@@ -126,7 +126,7 @@ whitespace   [ \t]+
                   }
 
 <STATE_string>\"  {
-                      char c = yyinput();
+                      char c = input();
                       if(c=='\"')
                     {
                       LIST;
@@ -135,9 +135,9 @@ whitespace   [ \t]+
                     }
                       else
                     {
-                      tokenString("string",str);
+                      tokenString(str);
                       unput(c);
-                      strbuf[0] = '\0';
+                      str[0] = '\0';
                       BEGIN 0;
                       return STRINGVAL;
                     }
@@ -184,6 +184,6 @@ whitespace   [ \t]+
 
 %%
 int yywrap(void){
-	puts("---the file is end---")
+	puts("---the file is end");
 	return 1;
 }
