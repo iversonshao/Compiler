@@ -1,0 +1,2931 @@
+未在文法中使用終結語詞
+
+    LP
+    RP
+    DOT
+    COMMA
+    COLON
+    SEMICOLON
+    LSB
+    RSB
+    LCB
+    RCB
+    ADDITION
+    SUBTRACTION
+    MULTIPLICATION
+    DIVISION
+    LT
+    GT
+    EQ
+    CHAR
+    DECREASING
+    DEFAULT
+    DO
+    PROCEDURE
+
+
+規則由於衝突而在剖析器中無用
+
+   77 block_or_statement: statements
+
+
+狀態 33 衝突：1 項偏移/縮減
+狀態 49 衝突：1 項偏移/縮減
+狀態 53 衝突：5 項偏移/縮減
+狀態 55 衝突：5 項偏移/縮減
+狀態 74 衝突：7 項偏移/縮減
+狀態 75 衝突：5 項偏移/縮減
+狀態 76 衝突：5 項偏移/縮減
+狀態 77 衝突：7 項偏移/縮減
+狀態 78 衝突：7 項偏移/縮減
+狀態 79 衝突：7 項偏移/縮減
+狀態 80 衝突：7 項偏移/縮減
+狀態 82 衝突：1 項偏移/縮減
+狀態 83 衝突：1 項偏移/縮減
+狀態 94 衝突：2 項偏移/縮減
+狀態 106 衝突：22 項偏移/縮減
+狀態 111 衝突：1 項偏移/縮減
+狀態 128 衝突：24 項縮減/縮減
+狀態 130 衝突：1 項偏移/縮減
+狀態 131 衝突：1 項偏移/縮減
+狀態 137 衝突：1 項偏移/縮減
+狀態 139 衝突：1 項偏移/縮減
+狀態 161 衝突：1 項偏移/縮減
+狀態 166 衝突：1 項偏移/縮減
+
+
+文法
+
+    0 $accept: program $end
+
+    1 $@1: ε
+
+    2 program: $@1 any_content
+
+    3 any_content: any_declaration
+    4            | any_content any_declaration
+
+    5 any_declaration: declaration
+    6                | functions
+
+    7 $@2: ε
+
+    8 functions: FUNCTION ID '(' $@2 function_contents
+
+    9 function_contents: function_arguments_contents ' ' END
+   10                  | function_arguments_contents ' ' block_except_brace END
+
+   11 function_arguments_contents: ')'
+   12                            | formal_arguments ')'
+   13                            | ')' ':' type
+   14                            | formal_arguments ')' ':' type
+
+   15 formal_arguments: ID ':' type
+   16                 | formal_arguments ',' ID ':' type
+
+   17 block_except_brace: block_content
+   18                   | block_content block_except_brace
+
+   19 block_content: declaration
+   20              | statements
+   21              | expression
+
+   22 declaration: const
+   23            | var
+   24            | array
+
+   25 const: CONST ID ASSIGNMENT expression
+   26      | CONST ID ASSIGNMENT type ASSIGNMENT expression
+
+   27 var: VAR ID
+   28    | VAR ID ':' type
+   29    | VAR ID ASSIGNMENT expression
+   30    | VAR ID ':' type ASSIGNMENT expression
+
+   31 array: VAR ID ':' ARRAY INT '.' '.' INT OF type
+
+   32 statements: ID ASSIGNMENT expression
+   33           | ID function_invocation
+   34           | ID '[' expression ']' '=' expression
+   35           | PUT expression
+   36           | GET ID
+   37           | SKIP
+   38           | EXIT
+   39           | EXIT WHEN expression
+   40           | RESULT expression
+   41           | RETURN
+   42           | loop
+   43           | conditional
+
+   44 conditional: IF boolean_expr THEN block_or_statement ELSE block_or_statement
+   45            | IF boolean_expr THEN block_or_statement
+
+   46 loop: LOOP block_or_statement
+   47     | FOR ID ':' const_expr '.' '.' const_expr block_or_statement
+
+   48 expression: '[' expression ']'
+   49           | expression OR expression
+   50           | expression AND expression
+   51           | NOT expression
+   52           | expression '-' expression
+   53           | expression '+' expression
+   54           | expression '/' expression
+   55           | expression '*' expression
+   56           | expression REMAINDER expression
+   57           | '-' expression
+   58           | STRING_Dump
+   59           | BOOLEAN_Dump
+   60           | data
+   61           | ID
+   62           | function_invocation
+
+   63 function_invocation: ID '(' function_arguments ')'
+
+   64 function_arguments: expression
+   65                   | function_arguments ',' expression
+
+   66 boolean_expr: expression '<' expression
+   67             | expression '>' expression
+   68             | expression LE expression
+   69             | expression GE expression
+   70             | expression '=' expression
+   71             | expression NOTE expression
+   72             | BOOLEAN_Dump
+
+   73 const_expr: INT
+   74           | REAL
+
+   75 block_or_statement: BEGIN block_except_brace END
+   76                   | block_except_brace
+   77                   | statements
+
+   78 type: INT
+   79     | REAL
+   80     | BOOL
+   81     | STRING
+   82     | BOOLEAN_Dump
+   83     | STRING_Dump
+
+   84 data: INT
+   85     | REAL
+   86     | STRING
+   87     | TRUE
+   88     | FALSE
+
+
+終結語詞，附有它們出現處的規則
+
+    $end (0) 0
+    ' ' (32) 9 10
+    '(' (40) 8 63
+    ')' (41) 11 12 13 14 63
+    '*' (42) 55
+    '+' (43) 53
+    ',' (44) 16 65
+    '-' (45) 52 57
+    '.' (46) 31 47
+    '/' (47) 54
+    ':' (58) 13 14 15 16 28 30 31 47
+    '<' (60) 66
+    '=' (61) 34 70
+    '>' (62) 67
+    '[' (91) 34 48
+    ']' (93) 34 48
+    error (256)
+    INT <intVal> (258) 31 73 78 84
+    REAL <realVal> (259) 74 79 85
+    STRING_Dump <stringVal> (260) 58 83
+    BOOLEAN_Dump <boolVal> (261) 59 72 82
+    ID <stringVal> (262) 8 15 16 25 26 27 28 29 30 31 32 33 34 36 47 61 63
+    LP (263)
+    RP (264)
+    DOT (265)
+    COMMA (266)
+    COLON (267)
+    SEMICOLON (268)
+    LSB (269)
+    RSB (270)
+    LCB (271)
+    RCB (272)
+    ADDITION (273)
+    SUBTRACTION (274)
+    MULTIPLICATION (275)
+    DIVISION (276)
+    REMAINDER (277) 56
+    ASSIGNMENT (278) 25 26 29 30 32
+    LT (279)
+    LE (280) 68
+    GE (281) 69
+    GT (282)
+    EQ (283)
+    NOTE (284) 71
+    AND (285) 50
+    OR (286) 49
+    NOT (287) 51
+    BOOL (288) 80
+    STRING (289) 81 86
+    VAR (290) 27 28 29 30 31
+    ARRAY (291) 31
+    CONST (292) 25 26
+    BEGIN (293) 75
+    CHAR (294)
+    DECREASING (295)
+    DEFAULT (296)
+    DO (297)
+    ELSE (298) 44
+    END (299) 9 10 75
+    EXIT (300) 38 39
+    FOR (301) 47
+    FUNCTION (302) 8
+    GET (303) 36
+    IF (304) 44 45
+    LOOP (305) 46
+    OF (306) 31
+    PUT (307) 35
+    PROCEDURE (308)
+    RESULT (309) 40
+    RETURN (310) 41
+    SKIP (311) 37
+    THEN (312) 44 45
+    WHEN (313) 39
+    FALSE (314) 88
+    TRUE (315) 87
+    UMINUS (316)
+
+
+非終結語詞，附有它們出現處的規則
+
+    $accept (77)
+        於左側： 0
+    program (78)
+        於左側： 2
+        於右側： 0
+    $@1 (79)
+        於左側： 1
+        於右側： 2
+    any_content (80)
+        於左側： 3 4
+        於右側： 2 4
+    any_declaration (81)
+        於左側： 5 6
+        於右側： 3 4
+    functions (82)
+        於左側： 8
+        於右側： 6
+    $@2 (83)
+        於左側： 7
+        於右側： 8
+    function_contents (84)
+        於左側： 9 10
+        於右側： 8
+    function_arguments_contents (85)
+        於左側： 11 12 13 14
+        於右側： 9 10
+    formal_arguments (86)
+        於左側： 15 16
+        於右側： 12 14 16
+    block_except_brace (87)
+        於左側： 17 18
+        於右側： 10 18 75 76
+    block_content (88)
+        於左側： 19 20 21
+        於右側： 17 18
+    declaration (89)
+        於左側： 22 23 24
+        於右側： 5 19
+    const (90)
+        於左側： 25 26
+        於右側： 22
+    var (91)
+        於左側： 27 28 29 30
+        於右側： 23
+    array (92)
+        於左側： 31
+        於右側： 24
+    statements (93)
+        於左側： 32 33 34 35 36 37 38 39 40 41 42 43
+        於右側： 20 77
+    conditional (94)
+        於左側： 44 45
+        於右側： 43
+    loop (95)
+        於左側： 46 47
+        於右側： 42
+    expression <dataType> (96)
+        於左側： 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62
+        於右側： 21 25 26 29 30 32 34 35 39 40 48 49 50 51 52 53 54 55 56 57 64 65 66 67 68 69 70 71
+    function_invocation (97)
+        於左側： 63
+        於右側： 33 62
+    function_arguments (98)
+        於左側： 64 65
+        於右側： 63 65
+    boolean_expr <dataType> (99)
+        於左側： 66 67 68 69 70 71 72
+        於右側： 44 45
+    const_expr <dataType> (100)
+        於左側： 73 74
+        於右側： 47
+    block_or_statement (101)
+        於左側： 75 76 77
+        於右側： 44 45 46 47
+    type <dataType> (102)
+        於左側： 78 79 80 81 82 83
+        於右側： 13 14 15 16 26 28 30 31
+    data <dataType> (103)
+        於左側： 84 85 86 87 88
+        於右側： 60
+
+
+狀態 0
+
+    0 $accept: • program $end
+
+    $default  使用規則 1 以縮減 ($@1)
+
+    program  進入狀態 1
+    $@1      進入狀態 2
+
+
+狀態 1
+
+    0 $accept: program • $end
+
+    $end  偏移，並進入狀態 3
+
+
+狀態 2
+
+    2 program: $@1 • any_content
+
+    VAR       偏移，並進入狀態 4
+    CONST     偏移，並進入狀態 5
+    FUNCTION  偏移，並進入狀態 6
+
+    any_content      進入狀態 7
+    any_declaration  進入狀態 8
+    functions        進入狀態 9
+    declaration      進入狀態 10
+    const            進入狀態 11
+    var              進入狀態 12
+    array            進入狀態 13
+
+
+狀態 3
+
+    0 $accept: program $end •
+
+    $default  接受
+
+
+狀態 4
+
+   27 var: VAR • ID
+   28    | VAR • ID ':' type
+   29    | VAR • ID ASSIGNMENT expression
+   30    | VAR • ID ':' type ASSIGNMENT expression
+   31 array: VAR • ID ':' ARRAY INT '.' '.' INT OF type
+
+    ID  偏移，並進入狀態 14
+
+
+狀態 5
+
+   25 const: CONST • ID ASSIGNMENT expression
+   26      | CONST • ID ASSIGNMENT type ASSIGNMENT expression
+
+    ID  偏移，並進入狀態 15
+
+
+狀態 6
+
+    8 functions: FUNCTION • ID '(' $@2 function_contents
+
+    ID  偏移，並進入狀態 16
+
+
+狀態 7
+
+    2 program: $@1 any_content •
+    4 any_content: any_content • any_declaration
+
+    VAR       偏移，並進入狀態 4
+    CONST     偏移，並進入狀態 5
+    FUNCTION  偏移，並進入狀態 6
+
+    $default  使用規則 2 以縮減 (program)
+
+    any_declaration  進入狀態 17
+    functions        進入狀態 9
+    declaration      進入狀態 10
+    const            進入狀態 11
+    var              進入狀態 12
+    array            進入狀態 13
+
+
+狀態 8
+
+    3 any_content: any_declaration •
+
+    $default  使用規則 3 以縮減 (any_content)
+
+
+狀態 9
+
+    6 any_declaration: functions •
+
+    $default  使用規則 6 以縮減 (any_declaration)
+
+
+狀態 10
+
+    5 any_declaration: declaration •
+
+    $default  使用規則 5 以縮減 (any_declaration)
+
+
+狀態 11
+
+   22 declaration: const •
+
+    $default  使用規則 22 以縮減 (declaration)
+
+
+狀態 12
+
+   23 declaration: var •
+
+    $default  使用規則 23 以縮減 (declaration)
+
+
+狀態 13
+
+   24 declaration: array •
+
+    $default  使用規則 24 以縮減 (declaration)
+
+
+狀態 14
+
+   27 var: VAR ID •
+   28    | VAR ID • ':' type
+   29    | VAR ID • ASSIGNMENT expression
+   30    | VAR ID • ':' type ASSIGNMENT expression
+   31 array: VAR ID • ':' ARRAY INT '.' '.' INT OF type
+
+    ASSIGNMENT  偏移，並進入狀態 18
+    ':'         偏移，並進入狀態 19
+
+    $default  使用規則 27 以縮減 (var)
+
+
+狀態 15
+
+   25 const: CONST ID • ASSIGNMENT expression
+   26      | CONST ID • ASSIGNMENT type ASSIGNMENT expression
+
+    ASSIGNMENT  偏移，並進入狀態 20
+
+
+狀態 16
+
+    8 functions: FUNCTION ID • '(' $@2 function_contents
+
+    '('  偏移，並進入狀態 21
+
+
+狀態 17
+
+    4 any_content: any_content any_declaration •
+
+    $default  使用規則 4 以縮減 (any_content)
+
+
+狀態 18
+
+   29 var: VAR ID ASSIGNMENT • expression
+
+    INT           偏移，並進入狀態 22
+    REAL          偏移，並進入狀態 23
+    STRING_Dump   偏移，並進入狀態 24
+    BOOLEAN_Dump  偏移，並進入狀態 25
+    ID            偏移，並進入狀態 26
+    NOT           偏移，並進入狀態 27
+    STRING        偏移，並進入狀態 28
+    FALSE         偏移，並進入狀態 29
+    TRUE          偏移，並進入狀態 30
+    '['           偏移，並進入狀態 31
+    '-'           偏移，並進入狀態 32
+
+    expression           進入狀態 33
+    function_invocation  進入狀態 34
+    data                 進入狀態 35
+
+
+狀態 19
+
+   28 var: VAR ID ':' • type
+   30    | VAR ID ':' • type ASSIGNMENT expression
+   31 array: VAR ID ':' • ARRAY INT '.' '.' INT OF type
+
+    INT           偏移，並進入狀態 36
+    REAL          偏移，並進入狀態 37
+    STRING_Dump   偏移，並進入狀態 38
+    BOOLEAN_Dump  偏移，並進入狀態 39
+    BOOL          偏移，並進入狀態 40
+    STRING        偏移，並進入狀態 41
+    ARRAY         偏移，並進入狀態 42
+
+    type  進入狀態 43
+
+
+狀態 20
+
+   25 const: CONST ID ASSIGNMENT • expression
+   26      | CONST ID ASSIGNMENT • type ASSIGNMENT expression
+
+    INT           偏移，並進入狀態 44
+    REAL          偏移，並進入狀態 45
+    STRING_Dump   偏移，並進入狀態 46
+    BOOLEAN_Dump  偏移，並進入狀態 47
+    ID            偏移，並進入狀態 26
+    NOT           偏移，並進入狀態 27
+    BOOL          偏移，並進入狀態 40
+    STRING        偏移，並進入狀態 48
+    FALSE         偏移，並進入狀態 29
+    TRUE          偏移，並進入狀態 30
+    '['           偏移，並進入狀態 31
+    '-'           偏移，並進入狀態 32
+
+    expression           進入狀態 49
+    function_invocation  進入狀態 34
+    type                 進入狀態 50
+    data                 進入狀態 35
+
+
+狀態 21
+
+    8 functions: FUNCTION ID '(' • $@2 function_contents
+
+    $default  使用規則 7 以縮減 ($@2)
+
+    $@2  進入狀態 51
+
+
+狀態 22
+
+   84 data: INT •
+
+    $default  使用規則 84 以縮減 (data)
+
+
+狀態 23
+
+   85 data: REAL •
+
+    $default  使用規則 85 以縮減 (data)
+
+
+狀態 24
+
+   58 expression: STRING_Dump •
+
+    $default  使用規則 58 以縮減 (expression)
+
+
+狀態 25
+
+   59 expression: BOOLEAN_Dump •
+
+    $default  使用規則 59 以縮減 (expression)
+
+
+狀態 26
+
+   61 expression: ID •
+   63 function_invocation: ID • '(' function_arguments ')'
+
+    '('  偏移，並進入狀態 52
+
+    $default  使用規則 61 以縮減 (expression)
+
+
+狀態 27
+
+   51 expression: NOT • expression
+
+    INT           偏移，並進入狀態 22
+    REAL          偏移，並進入狀態 23
+    STRING_Dump   偏移，並進入狀態 24
+    BOOLEAN_Dump  偏移，並進入狀態 25
+    ID            偏移，並進入狀態 26
+    NOT           偏移，並進入狀態 27
+    STRING        偏移，並進入狀態 28
+    FALSE         偏移，並進入狀態 29
+    TRUE          偏移，並進入狀態 30
+    '['           偏移，並進入狀態 31
+    '-'           偏移，並進入狀態 32
+
+    expression           進入狀態 53
+    function_invocation  進入狀態 34
+    data                 進入狀態 35
+
+
+狀態 28
+
+   86 data: STRING •
+
+    $default  使用規則 86 以縮減 (data)
+
+
+狀態 29
+
+   88 data: FALSE •
+
+    $default  使用規則 88 以縮減 (data)
+
+
+狀態 30
+
+   87 data: TRUE •
+
+    $default  使用規則 87 以縮減 (data)
+
+
+狀態 31
+
+   48 expression: '[' • expression ']'
+
+    INT           偏移，並進入狀態 22
+    REAL          偏移，並進入狀態 23
+    STRING_Dump   偏移，並進入狀態 24
+    BOOLEAN_Dump  偏移，並進入狀態 25
+    ID            偏移，並進入狀態 26
+    NOT           偏移，並進入狀態 27
+    STRING        偏移，並進入狀態 28
+    FALSE         偏移，並進入狀態 29
+    TRUE          偏移，並進入狀態 30
+    '['           偏移，並進入狀態 31
+    '-'           偏移，並進入狀態 32
+
+    expression           進入狀態 54
+    function_invocation  進入狀態 34
+    data                 進入狀態 35
+
+
+狀態 32
+
+   57 expression: '-' • expression
+
+    INT           偏移，並進入狀態 22
+    REAL          偏移，並進入狀態 23
+    STRING_Dump   偏移，並進入狀態 24
+    BOOLEAN_Dump  偏移，並進入狀態 25
+    ID            偏移，並進入狀態 26
+    NOT           偏移，並進入狀態 27
+    STRING        偏移，並進入狀態 28
+    FALSE         偏移，並進入狀態 29
+    TRUE          偏移，並進入狀態 30
+    '['           偏移，並進入狀態 31
+    '-'           偏移，並進入狀態 32
+
+    expression           進入狀態 55
+    function_invocation  進入狀態 34
+    data                 進入狀態 35
+
+
+狀態 33
+
+   29 var: VAR ID ASSIGNMENT expression •
+   49 expression: expression • OR expression
+   50           | expression • AND expression
+   52           | expression • '-' expression
+   53           | expression • '+' expression
+   54           | expression • '/' expression
+   55           | expression • '*' expression
+   56           | expression • REMAINDER expression
+
+    REMAINDER  偏移，並進入狀態 56
+    AND        偏移，並進入狀態 57
+    OR         偏移，並進入狀態 58
+    '-'        偏移，並進入狀態 59
+    '+'        偏移，並進入狀態 60
+    '/'        偏移，並進入狀態 61
+    '*'        偏移，並進入狀態 62
+
+    '-'       [使用規則 29 以縮減 (var)]
+    $default  使用規則 29 以縮減 (var)
+
+
+狀態 34
+
+   62 expression: function_invocation •
+
+    $default  使用規則 62 以縮減 (expression)
+
+
+狀態 35
+
+   60 expression: data •
+
+    $default  使用規則 60 以縮減 (expression)
+
+
+狀態 36
+
+   78 type: INT •
+
+    $default  使用規則 78 以縮減 (type)
+
+
+狀態 37
+
+   79 type: REAL •
+
+    $default  使用規則 79 以縮減 (type)
+
+
+狀態 38
+
+   83 type: STRING_Dump •
+
+    $default  使用規則 83 以縮減 (type)
+
+
+狀態 39
+
+   82 type: BOOLEAN_Dump •
+
+    $default  使用規則 82 以縮減 (type)
+
+
+狀態 40
+
+   80 type: BOOL •
+
+    $default  使用規則 80 以縮減 (type)
+
+
+狀態 41
+
+   81 type: STRING •
+
+    $default  使用規則 81 以縮減 (type)
+
+
+狀態 42
+
+   31 array: VAR ID ':' ARRAY • INT '.' '.' INT OF type
+
+    INT  偏移，並進入狀態 63
+
+
+狀態 43
+
+   28 var: VAR ID ':' type •
+   30    | VAR ID ':' type • ASSIGNMENT expression
+
+    ASSIGNMENT  偏移，並進入狀態 64
+
+    $default  使用規則 28 以縮減 (var)
+
+
+狀態 44
+
+   78 type: INT •
+   84 data: INT •
+
+    ASSIGNMENT  使用規則 78 以縮減 (type)
+    $default    使用規則 84 以縮減 (data)
+
+
+狀態 45
+
+   79 type: REAL •
+   85 data: REAL •
+
+    ASSIGNMENT  使用規則 79 以縮減 (type)
+    $default    使用規則 85 以縮減 (data)
+
+
+狀態 46
+
+   58 expression: STRING_Dump •
+   83 type: STRING_Dump •
+
+    ASSIGNMENT  使用規則 83 以縮減 (type)
+    $default    使用規則 58 以縮減 (expression)
+
+
+狀態 47
+
+   59 expression: BOOLEAN_Dump •
+   82 type: BOOLEAN_Dump •
+
+    ASSIGNMENT  使用規則 82 以縮減 (type)
+    $default    使用規則 59 以縮減 (expression)
+
+
+狀態 48
+
+   81 type: STRING •
+   86 data: STRING •
+
+    ASSIGNMENT  使用規則 81 以縮減 (type)
+    $default    使用規則 86 以縮減 (data)
+
+
+狀態 49
+
+   25 const: CONST ID ASSIGNMENT expression •
+   49 expression: expression • OR expression
+   50           | expression • AND expression
+   52           | expression • '-' expression
+   53           | expression • '+' expression
+   54           | expression • '/' expression
+   55           | expression • '*' expression
+   56           | expression • REMAINDER expression
+
+    REMAINDER  偏移，並進入狀態 56
+    AND        偏移，並進入狀態 57
+    OR         偏移，並進入狀態 58
+    '-'        偏移，並進入狀態 59
+    '+'        偏移，並進入狀態 60
+    '/'        偏移，並進入狀態 61
+    '*'        偏移，並進入狀態 62
+
+    '-'       [使用規則 25 以縮減 (const)]
+    $default  使用規則 25 以縮減 (const)
+
+
+狀態 50
+
+   26 const: CONST ID ASSIGNMENT type • ASSIGNMENT expression
+
+    ASSIGNMENT  偏移，並進入狀態 65
+
+
+狀態 51
+
+    8 functions: FUNCTION ID '(' $@2 • function_contents
+
+    ID   偏移，並進入狀態 66
+    ')'  偏移，並進入狀態 67
+
+    function_contents            進入狀態 68
+    function_arguments_contents  進入狀態 69
+    formal_arguments             進入狀態 70
+
+
+狀態 52
+
+   63 function_invocation: ID '(' • function_arguments ')'
+
+    INT           偏移，並進入狀態 22
+    REAL          偏移，並進入狀態 23
+    STRING_Dump   偏移，並進入狀態 24
+    BOOLEAN_Dump  偏移，並進入狀態 25
+    ID            偏移，並進入狀態 26
+    NOT           偏移，並進入狀態 27
+    STRING        偏移，並進入狀態 28
+    FALSE         偏移，並進入狀態 29
+    TRUE          偏移，並進入狀態 30
+    '['           偏移，並進入狀態 31
+    '-'           偏移，並進入狀態 32
+
+    expression           進入狀態 71
+    function_invocation  進入狀態 34
+    function_arguments   進入狀態 72
+    data                 進入狀態 35
+
+
+狀態 53
+
+   49 expression: expression • OR expression
+   50           | expression • AND expression
+   51           | NOT expression •
+   52           | expression • '-' expression
+   53           | expression • '+' expression
+   54           | expression • '/' expression
+   55           | expression • '*' expression
+   56           | expression • REMAINDER expression
+
+    REMAINDER  偏移，並進入狀態 56
+    '-'        偏移，並進入狀態 59
+    '+'        偏移，並進入狀態 60
+    '/'        偏移，並進入狀態 61
+    '*'        偏移，並進入狀態 62
+
+    REMAINDER  [使用規則 51 以縮減 (expression)]
+    '-'        [使用規則 51 以縮減 (expression)]
+    '+'        [使用規則 51 以縮減 (expression)]
+    '/'        [使用規則 51 以縮減 (expression)]
+    '*'        [使用規則 51 以縮減 (expression)]
+    $default   使用規則 51 以縮減 (expression)
+
+
+狀態 54
+
+   48 expression: '[' expression • ']'
+   49           | expression • OR expression
+   50           | expression • AND expression
+   52           | expression • '-' expression
+   53           | expression • '+' expression
+   54           | expression • '/' expression
+   55           | expression • '*' expression
+   56           | expression • REMAINDER expression
+
+    REMAINDER  偏移，並進入狀態 56
+    AND        偏移，並進入狀態 57
+    OR         偏移，並進入狀態 58
+    ']'        偏移，並進入狀態 73
+    '-'        偏移，並進入狀態 59
+    '+'        偏移，並進入狀態 60
+    '/'        偏移，並進入狀態 61
+    '*'        偏移，並進入狀態 62
+
+
+狀態 55
+
+   49 expression: expression • OR expression
+   50           | expression • AND expression
+   52           | expression • '-' expression
+   53           | expression • '+' expression
+   54           | expression • '/' expression
+   55           | expression • '*' expression
+   56           | expression • REMAINDER expression
+   57           | '-' expression •
+
+    REMAINDER  偏移，並進入狀態 56
+    '-'        偏移，並進入狀態 59
+    '+'        偏移，並進入狀態 60
+    '/'        偏移，並進入狀態 61
+    '*'        偏移，並進入狀態 62
+
+    REMAINDER  [使用規則 57 以縮減 (expression)]
+    '-'        [使用規則 57 以縮減 (expression)]
+    '+'        [使用規則 57 以縮減 (expression)]
+    '/'        [使用規則 57 以縮減 (expression)]
+    '*'        [使用規則 57 以縮減 (expression)]
+    $default   使用規則 57 以縮減 (expression)
+
+
+狀態 56
+
+   56 expression: expression REMAINDER • expression
+
+    INT           偏移，並進入狀態 22
+    REAL          偏移，並進入狀態 23
+    STRING_Dump   偏移，並進入狀態 24
+    BOOLEAN_Dump  偏移，並進入狀態 25
+    ID            偏移，並進入狀態 26
+    NOT           偏移，並進入狀態 27
+    STRING        偏移，並進入狀態 28
+    FALSE         偏移，並進入狀態 29
+    TRUE          偏移，並進入狀態 30
+    '['           偏移，並進入狀態 31
+    '-'           偏移，並進入狀態 32
+
+    expression           進入狀態 74
+    function_invocation  進入狀態 34
+    data                 進入狀態 35
+
+
+狀態 57
+
+   50 expression: expression AND • expression
+
+    INT           偏移，並進入狀態 22
+    REAL          偏移，並進入狀態 23
+    STRING_Dump   偏移，並進入狀態 24
+    BOOLEAN_Dump  偏移，並進入狀態 25
+    ID            偏移，並進入狀態 26
+    NOT           偏移，並進入狀態 27
+    STRING        偏移，並進入狀態 28
+    FALSE         偏移，並進入狀態 29
+    TRUE          偏移，並進入狀態 30
+    '['           偏移，並進入狀態 31
+    '-'           偏移，並進入狀態 32
+
+    expression           進入狀態 75
+    function_invocation  進入狀態 34
+    data                 進入狀態 35
+
+
+狀態 58
+
+   49 expression: expression OR • expression
+
+    INT           偏移，並進入狀態 22
+    REAL          偏移，並進入狀態 23
+    STRING_Dump   偏移，並進入狀態 24
+    BOOLEAN_Dump  偏移，並進入狀態 25
+    ID            偏移，並進入狀態 26
+    NOT           偏移，並進入狀態 27
+    STRING        偏移，並進入狀態 28
+    FALSE         偏移，並進入狀態 29
+    TRUE          偏移，並進入狀態 30
+    '['           偏移，並進入狀態 31
+    '-'           偏移，並進入狀態 32
+
+    expression           進入狀態 76
+    function_invocation  進入狀態 34
+    data                 進入狀態 35
+
+
+狀態 59
+
+   52 expression: expression '-' • expression
+
+    INT           偏移，並進入狀態 22
+    REAL          偏移，並進入狀態 23
+    STRING_Dump   偏移，並進入狀態 24
+    BOOLEAN_Dump  偏移，並進入狀態 25
+    ID            偏移，並進入狀態 26
+    NOT           偏移，並進入狀態 27
+    STRING        偏移，並進入狀態 28
+    FALSE         偏移，並進入狀態 29
+    TRUE          偏移，並進入狀態 30
+    '['           偏移，並進入狀態 31
+    '-'           偏移，並進入狀態 32
+
+    expression           進入狀態 77
+    function_invocation  進入狀態 34
+    data                 進入狀態 35
+
+
+狀態 60
+
+   53 expression: expression '+' • expression
+
+    INT           偏移，並進入狀態 22
+    REAL          偏移，並進入狀態 23
+    STRING_Dump   偏移，並進入狀態 24
+    BOOLEAN_Dump  偏移，並進入狀態 25
+    ID            偏移，並進入狀態 26
+    NOT           偏移，並進入狀態 27
+    STRING        偏移，並進入狀態 28
+    FALSE         偏移，並進入狀態 29
+    TRUE          偏移，並進入狀態 30
+    '['           偏移，並進入狀態 31
+    '-'           偏移，並進入狀態 32
+
+    expression           進入狀態 78
+    function_invocation  進入狀態 34
+    data                 進入狀態 35
+
+
+狀態 61
+
+   54 expression: expression '/' • expression
+
+    INT           偏移，並進入狀態 22
+    REAL          偏移，並進入狀態 23
+    STRING_Dump   偏移，並進入狀態 24
+    BOOLEAN_Dump  偏移，並進入狀態 25
+    ID            偏移，並進入狀態 26
+    NOT           偏移，並進入狀態 27
+    STRING        偏移，並進入狀態 28
+    FALSE         偏移，並進入狀態 29
+    TRUE          偏移，並進入狀態 30
+    '['           偏移，並進入狀態 31
+    '-'           偏移，並進入狀態 32
+
+    expression           進入狀態 79
+    function_invocation  進入狀態 34
+    data                 進入狀態 35
+
+
+狀態 62
+
+   55 expression: expression '*' • expression
+
+    INT           偏移，並進入狀態 22
+    REAL          偏移，並進入狀態 23
+    STRING_Dump   偏移，並進入狀態 24
+    BOOLEAN_Dump  偏移，並進入狀態 25
+    ID            偏移，並進入狀態 26
+    NOT           偏移，並進入狀態 27
+    STRING        偏移，並進入狀態 28
+    FALSE         偏移，並進入狀態 29
+    TRUE          偏移，並進入狀態 30
+    '['           偏移，並進入狀態 31
+    '-'           偏移，並進入狀態 32
+
+    expression           進入狀態 80
+    function_invocation  進入狀態 34
+    data                 進入狀態 35
+
+
+狀態 63
+
+   31 array: VAR ID ':' ARRAY INT • '.' '.' INT OF type
+
+    '.'  偏移，並進入狀態 81
+
+
+狀態 64
+
+   30 var: VAR ID ':' type ASSIGNMENT • expression
+
+    INT           偏移，並進入狀態 22
+    REAL          偏移，並進入狀態 23
+    STRING_Dump   偏移，並進入狀態 24
+    BOOLEAN_Dump  偏移，並進入狀態 25
+    ID            偏移，並進入狀態 26
+    NOT           偏移，並進入狀態 27
+    STRING        偏移，並進入狀態 28
+    FALSE         偏移，並進入狀態 29
+    TRUE          偏移，並進入狀態 30
+    '['           偏移，並進入狀態 31
+    '-'           偏移，並進入狀態 32
+
+    expression           進入狀態 82
+    function_invocation  進入狀態 34
+    data                 進入狀態 35
+
+
+狀態 65
+
+   26 const: CONST ID ASSIGNMENT type ASSIGNMENT • expression
+
+    INT           偏移，並進入狀態 22
+    REAL          偏移，並進入狀態 23
+    STRING_Dump   偏移，並進入狀態 24
+    BOOLEAN_Dump  偏移，並進入狀態 25
+    ID            偏移，並進入狀態 26
+    NOT           偏移，並進入狀態 27
+    STRING        偏移，並進入狀態 28
+    FALSE         偏移，並進入狀態 29
+    TRUE          偏移，並進入狀態 30
+    '['           偏移，並進入狀態 31
+    '-'           偏移，並進入狀態 32
+
+    expression           進入狀態 83
+    function_invocation  進入狀態 34
+    data                 進入狀態 35
+
+
+狀態 66
+
+   15 formal_arguments: ID • ':' type
+
+    ':'  偏移，並進入狀態 84
+
+
+狀態 67
+
+   11 function_arguments_contents: ')' •
+   13                            | ')' • ':' type
+
+    ':'  偏移，並進入狀態 85
+
+    $default  使用規則 11 以縮減 (function_arguments_contents)
+
+
+狀態 68
+
+    8 functions: FUNCTION ID '(' $@2 function_contents •
+
+    $default  使用規則 8 以縮減 (functions)
+
+
+狀態 69
+
+    9 function_contents: function_arguments_contents • ' ' END
+   10                  | function_arguments_contents • ' ' block_except_brace END
+
+    ' '  偏移，並進入狀態 86
+
+
+狀態 70
+
+   12 function_arguments_contents: formal_arguments • ')'
+   14                            | formal_arguments • ')' ':' type
+   16 formal_arguments: formal_arguments • ',' ID ':' type
+
+    ')'  偏移，並進入狀態 87
+    ','  偏移，並進入狀態 88
+
+
+狀態 71
+
+   49 expression: expression • OR expression
+   50           | expression • AND expression
+   52           | expression • '-' expression
+   53           | expression • '+' expression
+   54           | expression • '/' expression
+   55           | expression • '*' expression
+   56           | expression • REMAINDER expression
+   64 function_arguments: expression •
+
+    REMAINDER  偏移，並進入狀態 56
+    AND        偏移，並進入狀態 57
+    OR         偏移，並進入狀態 58
+    '-'        偏移，並進入狀態 59
+    '+'        偏移，並進入狀態 60
+    '/'        偏移，並進入狀態 61
+    '*'        偏移，並進入狀態 62
+
+    $default  使用規則 64 以縮減 (function_arguments)
+
+
+狀態 72
+
+   63 function_invocation: ID '(' function_arguments • ')'
+   65 function_arguments: function_arguments • ',' expression
+
+    ')'  偏移，並進入狀態 89
+    ','  偏移，並進入狀態 90
+
+
+狀態 73
+
+   48 expression: '[' expression ']' •
+
+    $default  使用規則 48 以縮減 (expression)
+
+
+狀態 74
+
+   49 expression: expression • OR expression
+   50           | expression • AND expression
+   52           | expression • '-' expression
+   53           | expression • '+' expression
+   54           | expression • '/' expression
+   55           | expression • '*' expression
+   56           | expression • REMAINDER expression
+   56           | expression REMAINDER expression •
+
+    REMAINDER  偏移，並進入狀態 56
+    AND        偏移，並進入狀態 57
+    OR         偏移，並進入狀態 58
+    '-'        偏移，並進入狀態 59
+    '+'        偏移，並進入狀態 60
+    '/'        偏移，並進入狀態 61
+    '*'        偏移，並進入狀態 62
+
+    REMAINDER  [使用規則 56 以縮減 (expression)]
+    AND        [使用規則 56 以縮減 (expression)]
+    OR         [使用規則 56 以縮減 (expression)]
+    '-'        [使用規則 56 以縮減 (expression)]
+    '+'        [使用規則 56 以縮減 (expression)]
+    '/'        [使用規則 56 以縮減 (expression)]
+    '*'        [使用規則 56 以縮減 (expression)]
+    $default   使用規則 56 以縮減 (expression)
+
+
+狀態 75
+
+   49 expression: expression • OR expression
+   50           | expression • AND expression
+   50           | expression AND expression •
+   52           | expression • '-' expression
+   53           | expression • '+' expression
+   54           | expression • '/' expression
+   55           | expression • '*' expression
+   56           | expression • REMAINDER expression
+
+    REMAINDER  偏移，並進入狀態 56
+    '-'        偏移，並進入狀態 59
+    '+'        偏移，並進入狀態 60
+    '/'        偏移，並進入狀態 61
+    '*'        偏移，並進入狀態 62
+
+    REMAINDER  [使用規則 50 以縮減 (expression)]
+    '-'        [使用規則 50 以縮減 (expression)]
+    '+'        [使用規則 50 以縮減 (expression)]
+    '/'        [使用規則 50 以縮減 (expression)]
+    '*'        [使用規則 50 以縮減 (expression)]
+    $default   使用規則 50 以縮減 (expression)
+
+
+狀態 76
+
+   49 expression: expression • OR expression
+   49           | expression OR expression •
+   50           | expression • AND expression
+   52           | expression • '-' expression
+   53           | expression • '+' expression
+   54           | expression • '/' expression
+   55           | expression • '*' expression
+   56           | expression • REMAINDER expression
+
+    REMAINDER  偏移，並進入狀態 56
+    AND        偏移，並進入狀態 57
+    '-'        偏移，並進入狀態 59
+    '+'        偏移，並進入狀態 60
+    '/'        偏移，並進入狀態 61
+    '*'        偏移，並進入狀態 62
+
+    REMAINDER  [使用規則 49 以縮減 (expression)]
+    '-'        [使用規則 49 以縮減 (expression)]
+    '+'        [使用規則 49 以縮減 (expression)]
+    '/'        [使用規則 49 以縮減 (expression)]
+    '*'        [使用規則 49 以縮減 (expression)]
+    $default   使用規則 49 以縮減 (expression)
+
+
+狀態 77
+
+   49 expression: expression • OR expression
+   50           | expression • AND expression
+   52           | expression • '-' expression
+   52           | expression '-' expression •
+   53           | expression • '+' expression
+   54           | expression • '/' expression
+   55           | expression • '*' expression
+   56           | expression • REMAINDER expression
+
+    REMAINDER  偏移，並進入狀態 56
+    AND        偏移，並進入狀態 57
+    OR         偏移，並進入狀態 58
+    '-'        偏移，並進入狀態 59
+    '+'        偏移，並進入狀態 60
+    '/'        偏移，並進入狀態 61
+    '*'        偏移，並進入狀態 62
+
+    REMAINDER  [使用規則 52 以縮減 (expression)]
+    AND        [使用規則 52 以縮減 (expression)]
+    OR         [使用規則 52 以縮減 (expression)]
+    '-'        [使用規則 52 以縮減 (expression)]
+    '+'        [使用規則 52 以縮減 (expression)]
+    '/'        [使用規則 52 以縮減 (expression)]
+    '*'        [使用規則 52 以縮減 (expression)]
+    $default   使用規則 52 以縮減 (expression)
+
+
+狀態 78
+
+   49 expression: expression • OR expression
+   50           | expression • AND expression
+   52           | expression • '-' expression
+   53           | expression • '+' expression
+   53           | expression '+' expression •
+   54           | expression • '/' expression
+   55           | expression • '*' expression
+   56           | expression • REMAINDER expression
+
+    REMAINDER  偏移，並進入狀態 56
+    AND        偏移，並進入狀態 57
+    OR         偏移，並進入狀態 58
+    '-'        偏移，並進入狀態 59
+    '+'        偏移，並進入狀態 60
+    '/'        偏移，並進入狀態 61
+    '*'        偏移，並進入狀態 62
+
+    REMAINDER  [使用規則 53 以縮減 (expression)]
+    AND        [使用規則 53 以縮減 (expression)]
+    OR         [使用規則 53 以縮減 (expression)]
+    '-'        [使用規則 53 以縮減 (expression)]
+    '+'        [使用規則 53 以縮減 (expression)]
+    '/'        [使用規則 53 以縮減 (expression)]
+    '*'        [使用規則 53 以縮減 (expression)]
+    $default   使用規則 53 以縮減 (expression)
+
+
+狀態 79
+
+   49 expression: expression • OR expression
+   50           | expression • AND expression
+   52           | expression • '-' expression
+   53           | expression • '+' expression
+   54           | expression • '/' expression
+   54           | expression '/' expression •
+   55           | expression • '*' expression
+   56           | expression • REMAINDER expression
+
+    REMAINDER  偏移，並進入狀態 56
+    AND        偏移，並進入狀態 57
+    OR         偏移，並進入狀態 58
+    '-'        偏移，並進入狀態 59
+    '+'        偏移，並進入狀態 60
+    '/'        偏移，並進入狀態 61
+    '*'        偏移，並進入狀態 62
+
+    REMAINDER  [使用規則 54 以縮減 (expression)]
+    AND        [使用規則 54 以縮減 (expression)]
+    OR         [使用規則 54 以縮減 (expression)]
+    '-'        [使用規則 54 以縮減 (expression)]
+    '+'        [使用規則 54 以縮減 (expression)]
+    '/'        [使用規則 54 以縮減 (expression)]
+    '*'        [使用規則 54 以縮減 (expression)]
+    $default   使用規則 54 以縮減 (expression)
+
+
+狀態 80
+
+   49 expression: expression • OR expression
+   50           | expression • AND expression
+   52           | expression • '-' expression
+   53           | expression • '+' expression
+   54           | expression • '/' expression
+   55           | expression • '*' expression
+   55           | expression '*' expression •
+   56           | expression • REMAINDER expression
+
+    REMAINDER  偏移，並進入狀態 56
+    AND        偏移，並進入狀態 57
+    OR         偏移，並進入狀態 58
+    '-'        偏移，並進入狀態 59
+    '+'        偏移，並進入狀態 60
+    '/'        偏移，並進入狀態 61
+    '*'        偏移，並進入狀態 62
+
+    REMAINDER  [使用規則 55 以縮減 (expression)]
+    AND        [使用規則 55 以縮減 (expression)]
+    OR         [使用規則 55 以縮減 (expression)]
+    '-'        [使用規則 55 以縮減 (expression)]
+    '+'        [使用規則 55 以縮減 (expression)]
+    '/'        [使用規則 55 以縮減 (expression)]
+    '*'        [使用規則 55 以縮減 (expression)]
+    $default   使用規則 55 以縮減 (expression)
+
+
+狀態 81
+
+   31 array: VAR ID ':' ARRAY INT '.' • '.' INT OF type
+
+    '.'  偏移，並進入狀態 91
+
+
+狀態 82
+
+   30 var: VAR ID ':' type ASSIGNMENT expression •
+   49 expression: expression • OR expression
+   50           | expression • AND expression
+   52           | expression • '-' expression
+   53           | expression • '+' expression
+   54           | expression • '/' expression
+   55           | expression • '*' expression
+   56           | expression • REMAINDER expression
+
+    REMAINDER  偏移，並進入狀態 56
+    AND        偏移，並進入狀態 57
+    OR         偏移，並進入狀態 58
+    '-'        偏移，並進入狀態 59
+    '+'        偏移，並進入狀態 60
+    '/'        偏移，並進入狀態 61
+    '*'        偏移，並進入狀態 62
+
+    '-'       [使用規則 30 以縮減 (var)]
+    $default  使用規則 30 以縮減 (var)
+
+
+狀態 83
+
+   26 const: CONST ID ASSIGNMENT type ASSIGNMENT expression •
+   49 expression: expression • OR expression
+   50           | expression • AND expression
+   52           | expression • '-' expression
+   53           | expression • '+' expression
+   54           | expression • '/' expression
+   55           | expression • '*' expression
+   56           | expression • REMAINDER expression
+
+    REMAINDER  偏移，並進入狀態 56
+    AND        偏移，並進入狀態 57
+    OR         偏移，並進入狀態 58
+    '-'        偏移，並進入狀態 59
+    '+'        偏移，並進入狀態 60
+    '/'        偏移，並進入狀態 61
+    '*'        偏移，並進入狀態 62
+
+    '-'       [使用規則 26 以縮減 (const)]
+    $default  使用規則 26 以縮減 (const)
+
+
+狀態 84
+
+   15 formal_arguments: ID ':' • type
+
+    INT           偏移，並進入狀態 36
+    REAL          偏移，並進入狀態 37
+    STRING_Dump   偏移，並進入狀態 38
+    BOOLEAN_Dump  偏移，並進入狀態 39
+    BOOL          偏移，並進入狀態 40
+    STRING        偏移，並進入狀態 41
+
+    type  進入狀態 92
+
+
+狀態 85
+
+   13 function_arguments_contents: ')' ':' • type
+
+    INT           偏移，並進入狀態 36
+    REAL          偏移，並進入狀態 37
+    STRING_Dump   偏移，並進入狀態 38
+    BOOLEAN_Dump  偏移，並進入狀態 39
+    BOOL          偏移，並進入狀態 40
+    STRING        偏移，並進入狀態 41
+
+    type  進入狀態 93
+
+
+狀態 86
+
+    9 function_contents: function_arguments_contents ' ' • END
+   10                  | function_arguments_contents ' ' • block_except_brace END
+
+    INT           偏移，並進入狀態 22
+    REAL          偏移，並進入狀態 23
+    STRING_Dump   偏移，並進入狀態 24
+    BOOLEAN_Dump  偏移，並進入狀態 25
+    ID            偏移，並進入狀態 94
+    NOT           偏移，並進入狀態 27
+    STRING        偏移，並進入狀態 28
+    VAR           偏移，並進入狀態 4
+    CONST         偏移，並進入狀態 5
+    END           偏移，並進入狀態 95
+    EXIT          偏移，並進入狀態 96
+    FOR           偏移，並進入狀態 97
+    GET           偏移，並進入狀態 98
+    IF            偏移，並進入狀態 99
+    LOOP          偏移，並進入狀態 100
+    PUT           偏移，並進入狀態 101
+    RESULT        偏移，並進入狀態 102
+    RETURN        偏移，並進入狀態 103
+    SKIP          偏移，並進入狀態 104
+    FALSE         偏移，並進入狀態 29
+    TRUE          偏移，並進入狀態 30
+    '['           偏移，並進入狀態 31
+    '-'           偏移，並進入狀態 32
+
+    block_except_brace   進入狀態 105
+    block_content        進入狀態 106
+    declaration          進入狀態 107
+    const                進入狀態 11
+    var                  進入狀態 12
+    array                進入狀態 13
+    statements           進入狀態 108
+    conditional          進入狀態 109
+    loop                 進入狀態 110
+    expression           進入狀態 111
+    function_invocation  進入狀態 34
+    data                 進入狀態 35
+
+
+狀態 87
+
+   12 function_arguments_contents: formal_arguments ')' •
+   14                            | formal_arguments ')' • ':' type
+
+    ':'  偏移，並進入狀態 112
+
+    $default  使用規則 12 以縮減 (function_arguments_contents)
+
+
+狀態 88
+
+   16 formal_arguments: formal_arguments ',' • ID ':' type
+
+    ID  偏移，並進入狀態 113
+
+
+狀態 89
+
+   63 function_invocation: ID '(' function_arguments ')' •
+
+    $default  使用規則 63 以縮減 (function_invocation)
+
+
+狀態 90
+
+   65 function_arguments: function_arguments ',' • expression
+
+    INT           偏移，並進入狀態 22
+    REAL          偏移，並進入狀態 23
+    STRING_Dump   偏移，並進入狀態 24
+    BOOLEAN_Dump  偏移，並進入狀態 25
+    ID            偏移，並進入狀態 26
+    NOT           偏移，並進入狀態 27
+    STRING        偏移，並進入狀態 28
+    FALSE         偏移，並進入狀態 29
+    TRUE          偏移，並進入狀態 30
+    '['           偏移，並進入狀態 31
+    '-'           偏移，並進入狀態 32
+
+    expression           進入狀態 114
+    function_invocation  進入狀態 34
+    data                 進入狀態 35
+
+
+狀態 91
+
+   31 array: VAR ID ':' ARRAY INT '.' '.' • INT OF type
+
+    INT  偏移，並進入狀態 115
+
+
+狀態 92
+
+   15 formal_arguments: ID ':' type •
+
+    $default  使用規則 15 以縮減 (formal_arguments)
+
+
+狀態 93
+
+   13 function_arguments_contents: ')' ':' type •
+
+    $default  使用規則 13 以縮減 (function_arguments_contents)
+
+
+狀態 94
+
+   32 statements: ID • ASSIGNMENT expression
+   33           | ID • function_invocation
+   34           | ID • '[' expression ']' '=' expression
+   61 expression: ID •
+   63 function_invocation: ID • '(' function_arguments ')'
+
+    ID          偏移，並進入狀態 116
+    ASSIGNMENT  偏移，並進入狀態 117
+    '('         偏移，並進入狀態 52
+    '['         偏移，並進入狀態 118
+
+    ID        [使用規則 61 以縮減 (expression)]
+    '['       [使用規則 61 以縮減 (expression)]
+    $default  使用規則 61 以縮減 (expression)
+
+    function_invocation  進入狀態 119
+
+
+狀態 95
+
+    9 function_contents: function_arguments_contents ' ' END •
+
+    $default  使用規則 9 以縮減 (function_contents)
+
+
+狀態 96
+
+   38 statements: EXIT •
+   39           | EXIT • WHEN expression
+
+    WHEN  偏移，並進入狀態 120
+
+    $default  使用規則 38 以縮減 (statements)
+
+
+狀態 97
+
+   47 loop: FOR • ID ':' const_expr '.' '.' const_expr block_or_statement
+
+    ID  偏移，並進入狀態 121
+
+
+狀態 98
+
+   36 statements: GET • ID
+
+    ID  偏移，並進入狀態 122
+
+
+狀態 99
+
+   44 conditional: IF • boolean_expr THEN block_or_statement ELSE block_or_statement
+   45            | IF • boolean_expr THEN block_or_statement
+
+    INT           偏移，並進入狀態 22
+    REAL          偏移，並進入狀態 23
+    STRING_Dump   偏移，並進入狀態 24
+    BOOLEAN_Dump  偏移，並進入狀態 123
+    ID            偏移，並進入狀態 26
+    NOT           偏移，並進入狀態 27
+    STRING        偏移，並進入狀態 28
+    FALSE         偏移，並進入狀態 29
+    TRUE          偏移，並進入狀態 30
+    '['           偏移，並進入狀態 31
+    '-'           偏移，並進入狀態 32
+
+    expression           進入狀態 124
+    function_invocation  進入狀態 34
+    boolean_expr         進入狀態 125
+    data                 進入狀態 35
+
+
+狀態 100
+
+   46 loop: LOOP • block_or_statement
+
+    INT           偏移，並進入狀態 22
+    REAL          偏移，並進入狀態 23
+    STRING_Dump   偏移，並進入狀態 24
+    BOOLEAN_Dump  偏移，並進入狀態 25
+    ID            偏移，並進入狀態 94
+    NOT           偏移，並進入狀態 27
+    STRING        偏移，並進入狀態 28
+    VAR           偏移，並進入狀態 4
+    CONST         偏移，並進入狀態 5
+    BEGIN         偏移，並進入狀態 126
+    EXIT          偏移，並進入狀態 96
+    FOR           偏移，並進入狀態 97
+    GET           偏移，並進入狀態 98
+    IF            偏移，並進入狀態 99
+    LOOP          偏移，並進入狀態 100
+    PUT           偏移，並進入狀態 101
+    RESULT        偏移，並進入狀態 102
+    RETURN        偏移，並進入狀態 103
+    SKIP          偏移，並進入狀態 104
+    FALSE         偏移，並進入狀態 29
+    TRUE          偏移，並進入狀態 30
+    '['           偏移，並進入狀態 31
+    '-'           偏移，並進入狀態 32
+
+    block_except_brace   進入狀態 127
+    block_content        進入狀態 106
+    declaration          進入狀態 107
+    const                進入狀態 11
+    var                  進入狀態 12
+    array                進入狀態 13
+    statements           進入狀態 128
+    conditional          進入狀態 109
+    loop                 進入狀態 110
+    expression           進入狀態 111
+    function_invocation  進入狀態 34
+    block_or_statement   進入狀態 129
+    data                 進入狀態 35
+
+
+狀態 101
+
+   35 statements: PUT • expression
+
+    INT           偏移，並進入狀態 22
+    REAL          偏移，並進入狀態 23
+    STRING_Dump   偏移，並進入狀態 24
+    BOOLEAN_Dump  偏移，並進入狀態 25
+    ID            偏移，並進入狀態 26
+    NOT           偏移，並進入狀態 27
+    STRING        偏移，並進入狀態 28
+    FALSE         偏移，並進入狀態 29
+    TRUE          偏移，並進入狀態 30
+    '['           偏移，並進入狀態 31
+    '-'           偏移，並進入狀態 32
+
+    expression           進入狀態 130
+    function_invocation  進入狀態 34
+    data                 進入狀態 35
+
+
+狀態 102
+
+   40 statements: RESULT • expression
+
+    INT           偏移，並進入狀態 22
+    REAL          偏移，並進入狀態 23
+    STRING_Dump   偏移，並進入狀態 24
+    BOOLEAN_Dump  偏移，並進入狀態 25
+    ID            偏移，並進入狀態 26
+    NOT           偏移，並進入狀態 27
+    STRING        偏移，並進入狀態 28
+    FALSE         偏移，並進入狀態 29
+    TRUE          偏移，並進入狀態 30
+    '['           偏移，並進入狀態 31
+    '-'           偏移，並進入狀態 32
+
+    expression           進入狀態 131
+    function_invocation  進入狀態 34
+    data                 進入狀態 35
+
+
+狀態 103
+
+   41 statements: RETURN •
+
+    $default  使用規則 41 以縮減 (statements)
+
+
+狀態 104
+
+   37 statements: SKIP •
+
+    $default  使用規則 37 以縮減 (statements)
+
+
+狀態 105
+
+   10 function_contents: function_arguments_contents ' ' block_except_brace • END
+
+    END  偏移，並進入狀態 132
+
+
+狀態 106
+
+   17 block_except_brace: block_content •
+   18                   | block_content • block_except_brace
+
+    INT           偏移，並進入狀態 22
+    REAL          偏移，並進入狀態 23
+    STRING_Dump   偏移，並進入狀態 24
+    BOOLEAN_Dump  偏移，並進入狀態 25
+    ID            偏移，並進入狀態 94
+    NOT           偏移，並進入狀態 27
+    STRING        偏移，並進入狀態 28
+    VAR           偏移，並進入狀態 4
+    CONST         偏移，並進入狀態 5
+    EXIT          偏移，並進入狀態 96
+    FOR           偏移，並進入狀態 97
+    GET           偏移，並進入狀態 98
+    IF            偏移，並進入狀態 99
+    LOOP          偏移，並進入狀態 100
+    PUT           偏移，並進入狀態 101
+    RESULT        偏移，並進入狀態 102
+    RETURN        偏移，並進入狀態 103
+    SKIP          偏移，並進入狀態 104
+    FALSE         偏移，並進入狀態 29
+    TRUE          偏移，並進入狀態 30
+    '['           偏移，並進入狀態 31
+    '-'           偏移，並進入狀態 32
+
+    INT           [使用規則 17 以縮減 (block_except_brace)]
+    REAL          [使用規則 17 以縮減 (block_except_brace)]
+    STRING_Dump   [使用規則 17 以縮減 (block_except_brace)]
+    BOOLEAN_Dump  [使用規則 17 以縮減 (block_except_brace)]
+    ID            [使用規則 17 以縮減 (block_except_brace)]
+    NOT           [使用規則 17 以縮減 (block_except_brace)]
+    STRING        [使用規則 17 以縮減 (block_except_brace)]
+    VAR           [使用規則 17 以縮減 (block_except_brace)]
+    CONST         [使用規則 17 以縮減 (block_except_brace)]
+    EXIT          [使用規則 17 以縮減 (block_except_brace)]
+    FOR           [使用規則 17 以縮減 (block_except_brace)]
+    GET           [使用規則 17 以縮減 (block_except_brace)]
+    IF            [使用規則 17 以縮減 (block_except_brace)]
+    LOOP          [使用規則 17 以縮減 (block_except_brace)]
+    PUT           [使用規則 17 以縮減 (block_except_brace)]
+    RESULT        [使用規則 17 以縮減 (block_except_brace)]
+    RETURN        [使用規則 17 以縮減 (block_except_brace)]
+    SKIP          [使用規則 17 以縮減 (block_except_brace)]
+    FALSE         [使用規則 17 以縮減 (block_except_brace)]
+    TRUE          [使用規則 17 以縮減 (block_except_brace)]
+    '['           [使用規則 17 以縮減 (block_except_brace)]
+    '-'           [使用規則 17 以縮減 (block_except_brace)]
+    $default      使用規則 17 以縮減 (block_except_brace)
+
+    block_except_brace   進入狀態 133
+    block_content        進入狀態 106
+    declaration          進入狀態 107
+    const                進入狀態 11
+    var                  進入狀態 12
+    array                進入狀態 13
+    statements           進入狀態 108
+    conditional          進入狀態 109
+    loop                 進入狀態 110
+    expression           進入狀態 111
+    function_invocation  進入狀態 34
+    data                 進入狀態 35
+
+
+狀態 107
+
+   19 block_content: declaration •
+
+    $default  使用規則 19 以縮減 (block_content)
+
+
+狀態 108
+
+   20 block_content: statements •
+
+    $default  使用規則 20 以縮減 (block_content)
+
+
+狀態 109
+
+   43 statements: conditional •
+
+    $default  使用規則 43 以縮減 (statements)
+
+
+狀態 110
+
+   42 statements: loop •
+
+    $default  使用規則 42 以縮減 (statements)
+
+
+狀態 111
+
+   21 block_content: expression •
+   49 expression: expression • OR expression
+   50           | expression • AND expression
+   52           | expression • '-' expression
+   53           | expression • '+' expression
+   54           | expression • '/' expression
+   55           | expression • '*' expression
+   56           | expression • REMAINDER expression
+
+    REMAINDER  偏移，並進入狀態 56
+    AND        偏移，並進入狀態 57
+    OR         偏移，並進入狀態 58
+    '-'        偏移，並進入狀態 59
+    '+'        偏移，並進入狀態 60
+    '/'        偏移，並進入狀態 61
+    '*'        偏移，並進入狀態 62
+
+    '-'       [使用規則 21 以縮減 (block_content)]
+    $default  使用規則 21 以縮減 (block_content)
+
+
+狀態 112
+
+   14 function_arguments_contents: formal_arguments ')' ':' • type
+
+    INT           偏移，並進入狀態 36
+    REAL          偏移，並進入狀態 37
+    STRING_Dump   偏移，並進入狀態 38
+    BOOLEAN_Dump  偏移，並進入狀態 39
+    BOOL          偏移，並進入狀態 40
+    STRING        偏移，並進入狀態 41
+
+    type  進入狀態 134
+
+
+狀態 113
+
+   16 formal_arguments: formal_arguments ',' ID • ':' type
+
+    ':'  偏移，並進入狀態 135
+
+
+狀態 114
+
+   49 expression: expression • OR expression
+   50           | expression • AND expression
+   52           | expression • '-' expression
+   53           | expression • '+' expression
+   54           | expression • '/' expression
+   55           | expression • '*' expression
+   56           | expression • REMAINDER expression
+   65 function_arguments: function_arguments ',' expression •
+
+    REMAINDER  偏移，並進入狀態 56
+    AND        偏移，並進入狀態 57
+    OR         偏移，並進入狀態 58
+    '-'        偏移，並進入狀態 59
+    '+'        偏移，並進入狀態 60
+    '/'        偏移，並進入狀態 61
+    '*'        偏移，並進入狀態 62
+
+    $default  使用規則 65 以縮減 (function_arguments)
+
+
+狀態 115
+
+   31 array: VAR ID ':' ARRAY INT '.' '.' INT • OF type
+
+    OF  偏移，並進入狀態 136
+
+
+狀態 116
+
+   63 function_invocation: ID • '(' function_arguments ')'
+
+    '('  偏移，並進入狀態 52
+
+
+狀態 117
+
+   32 statements: ID ASSIGNMENT • expression
+
+    INT           偏移，並進入狀態 22
+    REAL          偏移，並進入狀態 23
+    STRING_Dump   偏移，並進入狀態 24
+    BOOLEAN_Dump  偏移，並進入狀態 25
+    ID            偏移，並進入狀態 26
+    NOT           偏移，並進入狀態 27
+    STRING        偏移，並進入狀態 28
+    FALSE         偏移，並進入狀態 29
+    TRUE          偏移，並進入狀態 30
+    '['           偏移，並進入狀態 31
+    '-'           偏移，並進入狀態 32
+
+    expression           進入狀態 137
+    function_invocation  進入狀態 34
+    data                 進入狀態 35
+
+
+狀態 118
+
+   34 statements: ID '[' • expression ']' '=' expression
+
+    INT           偏移，並進入狀態 22
+    REAL          偏移，並進入狀態 23
+    STRING_Dump   偏移，並進入狀態 24
+    BOOLEAN_Dump  偏移，並進入狀態 25
+    ID            偏移，並進入狀態 26
+    NOT           偏移，並進入狀態 27
+    STRING        偏移，並進入狀態 28
+    FALSE         偏移，並進入狀態 29
+    TRUE          偏移，並進入狀態 30
+    '['           偏移，並進入狀態 31
+    '-'           偏移，並進入狀態 32
+
+    expression           進入狀態 138
+    function_invocation  進入狀態 34
+    data                 進入狀態 35
+
+
+狀態 119
+
+   33 statements: ID function_invocation •
+
+    $default  使用規則 33 以縮減 (statements)
+
+
+狀態 120
+
+   39 statements: EXIT WHEN • expression
+
+    INT           偏移，並進入狀態 22
+    REAL          偏移，並進入狀態 23
+    STRING_Dump   偏移，並進入狀態 24
+    BOOLEAN_Dump  偏移，並進入狀態 25
+    ID            偏移，並進入狀態 26
+    NOT           偏移，並進入狀態 27
+    STRING        偏移，並進入狀態 28
+    FALSE         偏移，並進入狀態 29
+    TRUE          偏移，並進入狀態 30
+    '['           偏移，並進入狀態 31
+    '-'           偏移，並進入狀態 32
+
+    expression           進入狀態 139
+    function_invocation  進入狀態 34
+    data                 進入狀態 35
+
+
+狀態 121
+
+   47 loop: FOR ID • ':' const_expr '.' '.' const_expr block_or_statement
+
+    ':'  偏移，並進入狀態 140
+
+
+狀態 122
+
+   36 statements: GET ID •
+
+    $default  使用規則 36 以縮減 (statements)
+
+
+狀態 123
+
+   59 expression: BOOLEAN_Dump •
+   72 boolean_expr: BOOLEAN_Dump •
+
+    THEN      使用規則 72 以縮減 (boolean_expr)
+    $default  使用規則 59 以縮減 (expression)
+
+
+狀態 124
+
+   49 expression: expression • OR expression
+   50           | expression • AND expression
+   52           | expression • '-' expression
+   53           | expression • '+' expression
+   54           | expression • '/' expression
+   55           | expression • '*' expression
+   56           | expression • REMAINDER expression
+   66 boolean_expr: expression • '<' expression
+   67             | expression • '>' expression
+   68             | expression • LE expression
+   69             | expression • GE expression
+   70             | expression • '=' expression
+   71             | expression • NOTE expression
+
+    REMAINDER  偏移，並進入狀態 56
+    LE         偏移，並進入狀態 141
+    GE         偏移，並進入狀態 142
+    NOTE       偏移，並進入狀態 143
+    AND        偏移，並進入狀態 57
+    OR         偏移，並進入狀態 58
+    '='        偏移，並進入狀態 144
+    '-'        偏移，並進入狀態 59
+    '+'        偏移，並進入狀態 60
+    '/'        偏移，並進入狀態 61
+    '*'        偏移，並進入狀態 62
+    '<'        偏移，並進入狀態 145
+    '>'        偏移，並進入狀態 146
+
+
+狀態 125
+
+   44 conditional: IF boolean_expr • THEN block_or_statement ELSE block_or_statement
+   45            | IF boolean_expr • THEN block_or_statement
+
+    THEN  偏移，並進入狀態 147
+
+
+狀態 126
+
+   75 block_or_statement: BEGIN • block_except_brace END
+
+    INT           偏移，並進入狀態 22
+    REAL          偏移，並進入狀態 23
+    STRING_Dump   偏移，並進入狀態 24
+    BOOLEAN_Dump  偏移，並進入狀態 25
+    ID            偏移，並進入狀態 94
+    NOT           偏移，並進入狀態 27
+    STRING        偏移，並進入狀態 28
+    VAR           偏移，並進入狀態 4
+    CONST         偏移，並進入狀態 5
+    EXIT          偏移，並進入狀態 96
+    FOR           偏移，並進入狀態 97
+    GET           偏移，並進入狀態 98
+    IF            偏移，並進入狀態 99
+    LOOP          偏移，並進入狀態 100
+    PUT           偏移，並進入狀態 101
+    RESULT        偏移，並進入狀態 102
+    RETURN        偏移，並進入狀態 103
+    SKIP          偏移，並進入狀態 104
+    FALSE         偏移，並進入狀態 29
+    TRUE          偏移，並進入狀態 30
+    '['           偏移，並進入狀態 31
+    '-'           偏移，並進入狀態 32
+
+    block_except_brace   進入狀態 148
+    block_content        進入狀態 106
+    declaration          進入狀態 107
+    const                進入狀態 11
+    var                  進入狀態 12
+    array                進入狀態 13
+    statements           進入狀態 108
+    conditional          進入狀態 109
+    loop                 進入狀態 110
+    expression           進入狀態 111
+    function_invocation  進入狀態 34
+    data                 進入狀態 35
+
+
+狀態 127
+
+   76 block_or_statement: block_except_brace •
+
+    $default  使用規則 76 以縮減 (block_or_statement)
+
+
+狀態 128
+
+   20 block_content: statements •
+   77 block_or_statement: statements •
+
+    INT           使用規則 20 以縮減 (block_content)
+    INT           [使用規則 77 以縮減 (block_or_statement)]
+    REAL          使用規則 20 以縮減 (block_content)
+    REAL          [使用規則 77 以縮減 (block_or_statement)]
+    STRING_Dump   使用規則 20 以縮減 (block_content)
+    STRING_Dump   [使用規則 77 以縮減 (block_or_statement)]
+    BOOLEAN_Dump  使用規則 20 以縮減 (block_content)
+    BOOLEAN_Dump  [使用規則 77 以縮減 (block_or_statement)]
+    ID            使用規則 20 以縮減 (block_content)
+    ID            [使用規則 77 以縮減 (block_or_statement)]
+    NOT           使用規則 20 以縮減 (block_content)
+    NOT           [使用規則 77 以縮減 (block_or_statement)]
+    STRING        使用規則 20 以縮減 (block_content)
+    STRING        [使用規則 77 以縮減 (block_or_statement)]
+    VAR           使用規則 20 以縮減 (block_content)
+    VAR           [使用規則 77 以縮減 (block_or_statement)]
+    CONST         使用規則 20 以縮減 (block_content)
+    CONST         [使用規則 77 以縮減 (block_or_statement)]
+    ELSE          使用規則 20 以縮減 (block_content)
+    ELSE          [使用規則 77 以縮減 (block_or_statement)]
+    END           使用規則 20 以縮減 (block_content)
+    END           [使用規則 77 以縮減 (block_or_statement)]
+    EXIT          使用規則 20 以縮減 (block_content)
+    EXIT          [使用規則 77 以縮減 (block_or_statement)]
+    FOR           使用規則 20 以縮減 (block_content)
+    FOR           [使用規則 77 以縮減 (block_or_statement)]
+    GET           使用規則 20 以縮減 (block_content)
+    GET           [使用規則 77 以縮減 (block_or_statement)]
+    IF            使用規則 20 以縮減 (block_content)
+    IF            [使用規則 77 以縮減 (block_or_statement)]
+    LOOP          使用規則 20 以縮減 (block_content)
+    LOOP          [使用規則 77 以縮減 (block_or_statement)]
+    PUT           使用規則 20 以縮減 (block_content)
+    PUT           [使用規則 77 以縮減 (block_or_statement)]
+    RESULT        使用規則 20 以縮減 (block_content)
+    RESULT        [使用規則 77 以縮減 (block_or_statement)]
+    RETURN        使用規則 20 以縮減 (block_content)
+    RETURN        [使用規則 77 以縮減 (block_or_statement)]
+    SKIP          使用規則 20 以縮減 (block_content)
+    SKIP          [使用規則 77 以縮減 (block_or_statement)]
+    FALSE         使用規則 20 以縮減 (block_content)
+    FALSE         [使用規則 77 以縮減 (block_or_statement)]
+    TRUE          使用規則 20 以縮減 (block_content)
+    TRUE          [使用規則 77 以縮減 (block_or_statement)]
+    '['           使用規則 20 以縮減 (block_content)
+    '['           [使用規則 77 以縮減 (block_or_statement)]
+    '-'           使用規則 20 以縮減 (block_content)
+    '-'           [使用規則 77 以縮減 (block_or_statement)]
+    $default      使用規則 20 以縮減 (block_content)
+
+
+狀態 129
+
+   46 loop: LOOP block_or_statement •
+
+    $default  使用規則 46 以縮減 (loop)
+
+
+狀態 130
+
+   35 statements: PUT expression •
+   49 expression: expression • OR expression
+   50           | expression • AND expression
+   52           | expression • '-' expression
+   53           | expression • '+' expression
+   54           | expression • '/' expression
+   55           | expression • '*' expression
+   56           | expression • REMAINDER expression
+
+    REMAINDER  偏移，並進入狀態 56
+    AND        偏移，並進入狀態 57
+    OR         偏移，並進入狀態 58
+    '-'        偏移，並進入狀態 59
+    '+'        偏移，並進入狀態 60
+    '/'        偏移，並進入狀態 61
+    '*'        偏移，並進入狀態 62
+
+    '-'       [使用規則 35 以縮減 (statements)]
+    $default  使用規則 35 以縮減 (statements)
+
+
+狀態 131
+
+   40 statements: RESULT expression •
+   49 expression: expression • OR expression
+   50           | expression • AND expression
+   52           | expression • '-' expression
+   53           | expression • '+' expression
+   54           | expression • '/' expression
+   55           | expression • '*' expression
+   56           | expression • REMAINDER expression
+
+    REMAINDER  偏移，並進入狀態 56
+    AND        偏移，並進入狀態 57
+    OR         偏移，並進入狀態 58
+    '-'        偏移，並進入狀態 59
+    '+'        偏移，並進入狀態 60
+    '/'        偏移，並進入狀態 61
+    '*'        偏移，並進入狀態 62
+
+    '-'       [使用規則 40 以縮減 (statements)]
+    $default  使用規則 40 以縮減 (statements)
+
+
+狀態 132
+
+   10 function_contents: function_arguments_contents ' ' block_except_brace END •
+
+    $default  使用規則 10 以縮減 (function_contents)
+
+
+狀態 133
+
+   18 block_except_brace: block_content block_except_brace •
+
+    $default  使用規則 18 以縮減 (block_except_brace)
+
+
+狀態 134
+
+   14 function_arguments_contents: formal_arguments ')' ':' type •
+
+    $default  使用規則 14 以縮減 (function_arguments_contents)
+
+
+狀態 135
+
+   16 formal_arguments: formal_arguments ',' ID ':' • type
+
+    INT           偏移，並進入狀態 36
+    REAL          偏移，並進入狀態 37
+    STRING_Dump   偏移，並進入狀態 38
+    BOOLEAN_Dump  偏移，並進入狀態 39
+    BOOL          偏移，並進入狀態 40
+    STRING        偏移，並進入狀態 41
+
+    type  進入狀態 149
+
+
+狀態 136
+
+   31 array: VAR ID ':' ARRAY INT '.' '.' INT OF • type
+
+    INT           偏移，並進入狀態 36
+    REAL          偏移，並進入狀態 37
+    STRING_Dump   偏移，並進入狀態 38
+    BOOLEAN_Dump  偏移，並進入狀態 39
+    BOOL          偏移，並進入狀態 40
+    STRING        偏移，並進入狀態 41
+
+    type  進入狀態 150
+
+
+狀態 137
+
+   32 statements: ID ASSIGNMENT expression •
+   49 expression: expression • OR expression
+   50           | expression • AND expression
+   52           | expression • '-' expression
+   53           | expression • '+' expression
+   54           | expression • '/' expression
+   55           | expression • '*' expression
+   56           | expression • REMAINDER expression
+
+    REMAINDER  偏移，並進入狀態 56
+    AND        偏移，並進入狀態 57
+    OR         偏移，並進入狀態 58
+    '-'        偏移，並進入狀態 59
+    '+'        偏移，並進入狀態 60
+    '/'        偏移，並進入狀態 61
+    '*'        偏移，並進入狀態 62
+
+    '-'       [使用規則 32 以縮減 (statements)]
+    $default  使用規則 32 以縮減 (statements)
+
+
+狀態 138
+
+   34 statements: ID '[' expression • ']' '=' expression
+   49 expression: expression • OR expression
+   50           | expression • AND expression
+   52           | expression • '-' expression
+   53           | expression • '+' expression
+   54           | expression • '/' expression
+   55           | expression • '*' expression
+   56           | expression • REMAINDER expression
+
+    REMAINDER  偏移，並進入狀態 56
+    AND        偏移，並進入狀態 57
+    OR         偏移，並進入狀態 58
+    ']'        偏移，並進入狀態 151
+    '-'        偏移，並進入狀態 59
+    '+'        偏移，並進入狀態 60
+    '/'        偏移，並進入狀態 61
+    '*'        偏移，並進入狀態 62
+
+
+狀態 139
+
+   39 statements: EXIT WHEN expression •
+   49 expression: expression • OR expression
+   50           | expression • AND expression
+   52           | expression • '-' expression
+   53           | expression • '+' expression
+   54           | expression • '/' expression
+   55           | expression • '*' expression
+   56           | expression • REMAINDER expression
+
+    REMAINDER  偏移，並進入狀態 56
+    AND        偏移，並進入狀態 57
+    OR         偏移，並進入狀態 58
+    '-'        偏移，並進入狀態 59
+    '+'        偏移，並進入狀態 60
+    '/'        偏移，並進入狀態 61
+    '*'        偏移，並進入狀態 62
+
+    '-'       [使用規則 39 以縮減 (statements)]
+    $default  使用規則 39 以縮減 (statements)
+
+
+狀態 140
+
+   47 loop: FOR ID ':' • const_expr '.' '.' const_expr block_or_statement
+
+    INT   偏移，並進入狀態 152
+    REAL  偏移，並進入狀態 153
+
+    const_expr  進入狀態 154
+
+
+狀態 141
+
+   68 boolean_expr: expression LE • expression
+
+    INT           偏移，並進入狀態 22
+    REAL          偏移，並進入狀態 23
+    STRING_Dump   偏移，並進入狀態 24
+    BOOLEAN_Dump  偏移，並進入狀態 25
+    ID            偏移，並進入狀態 26
+    NOT           偏移，並進入狀態 27
+    STRING        偏移，並進入狀態 28
+    FALSE         偏移，並進入狀態 29
+    TRUE          偏移，並進入狀態 30
+    '['           偏移，並進入狀態 31
+    '-'           偏移，並進入狀態 32
+
+    expression           進入狀態 155
+    function_invocation  進入狀態 34
+    data                 進入狀態 35
+
+
+狀態 142
+
+   69 boolean_expr: expression GE • expression
+
+    INT           偏移，並進入狀態 22
+    REAL          偏移，並進入狀態 23
+    STRING_Dump   偏移，並進入狀態 24
+    BOOLEAN_Dump  偏移，並進入狀態 25
+    ID            偏移，並進入狀態 26
+    NOT           偏移，並進入狀態 27
+    STRING        偏移，並進入狀態 28
+    FALSE         偏移，並進入狀態 29
+    TRUE          偏移，並進入狀態 30
+    '['           偏移，並進入狀態 31
+    '-'           偏移，並進入狀態 32
+
+    expression           進入狀態 156
+    function_invocation  進入狀態 34
+    data                 進入狀態 35
+
+
+狀態 143
+
+   71 boolean_expr: expression NOTE • expression
+
+    INT           偏移，並進入狀態 22
+    REAL          偏移，並進入狀態 23
+    STRING_Dump   偏移，並進入狀態 24
+    BOOLEAN_Dump  偏移，並進入狀態 25
+    ID            偏移，並進入狀態 26
+    NOT           偏移，並進入狀態 27
+    STRING        偏移，並進入狀態 28
+    FALSE         偏移，並進入狀態 29
+    TRUE          偏移，並進入狀態 30
+    '['           偏移，並進入狀態 31
+    '-'           偏移，並進入狀態 32
+
+    expression           進入狀態 157
+    function_invocation  進入狀態 34
+    data                 進入狀態 35
+
+
+狀態 144
+
+   70 boolean_expr: expression '=' • expression
+
+    INT           偏移，並進入狀態 22
+    REAL          偏移，並進入狀態 23
+    STRING_Dump   偏移，並進入狀態 24
+    BOOLEAN_Dump  偏移，並進入狀態 25
+    ID            偏移，並進入狀態 26
+    NOT           偏移，並進入狀態 27
+    STRING        偏移，並進入狀態 28
+    FALSE         偏移，並進入狀態 29
+    TRUE          偏移，並進入狀態 30
+    '['           偏移，並進入狀態 31
+    '-'           偏移，並進入狀態 32
+
+    expression           進入狀態 158
+    function_invocation  進入狀態 34
+    data                 進入狀態 35
+
+
+狀態 145
+
+   66 boolean_expr: expression '<' • expression
+
+    INT           偏移，並進入狀態 22
+    REAL          偏移，並進入狀態 23
+    STRING_Dump   偏移，並進入狀態 24
+    BOOLEAN_Dump  偏移，並進入狀態 25
+    ID            偏移，並進入狀態 26
+    NOT           偏移，並進入狀態 27
+    STRING        偏移，並進入狀態 28
+    FALSE         偏移，並進入狀態 29
+    TRUE          偏移，並進入狀態 30
+    '['           偏移，並進入狀態 31
+    '-'           偏移，並進入狀態 32
+
+    expression           進入狀態 159
+    function_invocation  進入狀態 34
+    data                 進入狀態 35
+
+
+狀態 146
+
+   67 boolean_expr: expression '>' • expression
+
+    INT           偏移，並進入狀態 22
+    REAL          偏移，並進入狀態 23
+    STRING_Dump   偏移，並進入狀態 24
+    BOOLEAN_Dump  偏移，並進入狀態 25
+    ID            偏移，並進入狀態 26
+    NOT           偏移，並進入狀態 27
+    STRING        偏移，並進入狀態 28
+    FALSE         偏移，並進入狀態 29
+    TRUE          偏移，並進入狀態 30
+    '['           偏移，並進入狀態 31
+    '-'           偏移，並進入狀態 32
+
+    expression           進入狀態 160
+    function_invocation  進入狀態 34
+    data                 進入狀態 35
+
+
+狀態 147
+
+   44 conditional: IF boolean_expr THEN • block_or_statement ELSE block_or_statement
+   45            | IF boolean_expr THEN • block_or_statement
+
+    INT           偏移，並進入狀態 22
+    REAL          偏移，並進入狀態 23
+    STRING_Dump   偏移，並進入狀態 24
+    BOOLEAN_Dump  偏移，並進入狀態 25
+    ID            偏移，並進入狀態 94
+    NOT           偏移，並進入狀態 27
+    STRING        偏移，並進入狀態 28
+    VAR           偏移，並進入狀態 4
+    CONST         偏移，並進入狀態 5
+    BEGIN         偏移，並進入狀態 126
+    EXIT          偏移，並進入狀態 96
+    FOR           偏移，並進入狀態 97
+    GET           偏移，並進入狀態 98
+    IF            偏移，並進入狀態 99
+    LOOP          偏移，並進入狀態 100
+    PUT           偏移，並進入狀態 101
+    RESULT        偏移，並進入狀態 102
+    RETURN        偏移，並進入狀態 103
+    SKIP          偏移，並進入狀態 104
+    FALSE         偏移，並進入狀態 29
+    TRUE          偏移，並進入狀態 30
+    '['           偏移，並進入狀態 31
+    '-'           偏移，並進入狀態 32
+
+    block_except_brace   進入狀態 127
+    block_content        進入狀態 106
+    declaration          進入狀態 107
+    const                進入狀態 11
+    var                  進入狀態 12
+    array                進入狀態 13
+    statements           進入狀態 128
+    conditional          進入狀態 109
+    loop                 進入狀態 110
+    expression           進入狀態 111
+    function_invocation  進入狀態 34
+    block_or_statement   進入狀態 161
+    data                 進入狀態 35
+
+
+狀態 148
+
+   75 block_or_statement: BEGIN block_except_brace • END
+
+    END  偏移，並進入狀態 162
+
+
+狀態 149
+
+   16 formal_arguments: formal_arguments ',' ID ':' type •
+
+    $default  使用規則 16 以縮減 (formal_arguments)
+
+
+狀態 150
+
+   31 array: VAR ID ':' ARRAY INT '.' '.' INT OF type •
+
+    $default  使用規則 31 以縮減 (array)
+
+
+狀態 151
+
+   34 statements: ID '[' expression ']' • '=' expression
+
+    '='  偏移，並進入狀態 163
+
+
+狀態 152
+
+   73 const_expr: INT •
+
+    $default  使用規則 73 以縮減 (const_expr)
+
+
+狀態 153
+
+   74 const_expr: REAL •
+
+    $default  使用規則 74 以縮減 (const_expr)
+
+
+狀態 154
+
+   47 loop: FOR ID ':' const_expr • '.' '.' const_expr block_or_statement
+
+    '.'  偏移，並進入狀態 164
+
+
+狀態 155
+
+   49 expression: expression • OR expression
+   50           | expression • AND expression
+   52           | expression • '-' expression
+   53           | expression • '+' expression
+   54           | expression • '/' expression
+   55           | expression • '*' expression
+   56           | expression • REMAINDER expression
+   68 boolean_expr: expression LE expression •
+
+    REMAINDER  偏移，並進入狀態 56
+    AND        偏移，並進入狀態 57
+    OR         偏移，並進入狀態 58
+    '-'        偏移，並進入狀態 59
+    '+'        偏移，並進入狀態 60
+    '/'        偏移，並進入狀態 61
+    '*'        偏移，並進入狀態 62
+
+    $default  使用規則 68 以縮減 (boolean_expr)
+
+
+狀態 156
+
+   49 expression: expression • OR expression
+   50           | expression • AND expression
+   52           | expression • '-' expression
+   53           | expression • '+' expression
+   54           | expression • '/' expression
+   55           | expression • '*' expression
+   56           | expression • REMAINDER expression
+   69 boolean_expr: expression GE expression •
+
+    REMAINDER  偏移，並進入狀態 56
+    AND        偏移，並進入狀態 57
+    OR         偏移，並進入狀態 58
+    '-'        偏移，並進入狀態 59
+    '+'        偏移，並進入狀態 60
+    '/'        偏移，並進入狀態 61
+    '*'        偏移，並進入狀態 62
+
+    $default  使用規則 69 以縮減 (boolean_expr)
+
+
+狀態 157
+
+   49 expression: expression • OR expression
+   50           | expression • AND expression
+   52           | expression • '-' expression
+   53           | expression • '+' expression
+   54           | expression • '/' expression
+   55           | expression • '*' expression
+   56           | expression • REMAINDER expression
+   71 boolean_expr: expression NOTE expression •
+
+    REMAINDER  偏移，並進入狀態 56
+    AND        偏移，並進入狀態 57
+    OR         偏移，並進入狀態 58
+    '-'        偏移，並進入狀態 59
+    '+'        偏移，並進入狀態 60
+    '/'        偏移，並進入狀態 61
+    '*'        偏移，並進入狀態 62
+
+    $default  使用規則 71 以縮減 (boolean_expr)
+
+
+狀態 158
+
+   49 expression: expression • OR expression
+   50           | expression • AND expression
+   52           | expression • '-' expression
+   53           | expression • '+' expression
+   54           | expression • '/' expression
+   55           | expression • '*' expression
+   56           | expression • REMAINDER expression
+   70 boolean_expr: expression '=' expression •
+
+    REMAINDER  偏移，並進入狀態 56
+    AND        偏移，並進入狀態 57
+    OR         偏移，並進入狀態 58
+    '-'        偏移，並進入狀態 59
+    '+'        偏移，並進入狀態 60
+    '/'        偏移，並進入狀態 61
+    '*'        偏移，並進入狀態 62
+
+    $default  使用規則 70 以縮減 (boolean_expr)
+
+
+狀態 159
+
+   49 expression: expression • OR expression
+   50           | expression • AND expression
+   52           | expression • '-' expression
+   53           | expression • '+' expression
+   54           | expression • '/' expression
+   55           | expression • '*' expression
+   56           | expression • REMAINDER expression
+   66 boolean_expr: expression '<' expression •
+
+    REMAINDER  偏移，並進入狀態 56
+    AND        偏移，並進入狀態 57
+    OR         偏移，並進入狀態 58
+    '-'        偏移，並進入狀態 59
+    '+'        偏移，並進入狀態 60
+    '/'        偏移，並進入狀態 61
+    '*'        偏移，並進入狀態 62
+
+    $default  使用規則 66 以縮減 (boolean_expr)
+
+
+狀態 160
+
+   49 expression: expression • OR expression
+   50           | expression • AND expression
+   52           | expression • '-' expression
+   53           | expression • '+' expression
+   54           | expression • '/' expression
+   55           | expression • '*' expression
+   56           | expression • REMAINDER expression
+   67 boolean_expr: expression '>' expression •
+
+    REMAINDER  偏移，並進入狀態 56
+    AND        偏移，並進入狀態 57
+    OR         偏移，並進入狀態 58
+    '-'        偏移，並進入狀態 59
+    '+'        偏移，並進入狀態 60
+    '/'        偏移，並進入狀態 61
+    '*'        偏移，並進入狀態 62
+
+    $default  使用規則 67 以縮減 (boolean_expr)
+
+
+狀態 161
+
+   44 conditional: IF boolean_expr THEN block_or_statement • ELSE block_or_statement
+   45            | IF boolean_expr THEN block_or_statement •
+
+    ELSE  偏移，並進入狀態 165
+
+    ELSE      [使用規則 45 以縮減 (conditional)]
+    $default  使用規則 45 以縮減 (conditional)
+
+
+狀態 162
+
+   75 block_or_statement: BEGIN block_except_brace END •
+
+    $default  使用規則 75 以縮減 (block_or_statement)
+
+
+狀態 163
+
+   34 statements: ID '[' expression ']' '=' • expression
+
+    INT           偏移，並進入狀態 22
+    REAL          偏移，並進入狀態 23
+    STRING_Dump   偏移，並進入狀態 24
+    BOOLEAN_Dump  偏移，並進入狀態 25
+    ID            偏移，並進入狀態 26
+    NOT           偏移，並進入狀態 27
+    STRING        偏移，並進入狀態 28
+    FALSE         偏移，並進入狀態 29
+    TRUE          偏移，並進入狀態 30
+    '['           偏移，並進入狀態 31
+    '-'           偏移，並進入狀態 32
+
+    expression           進入狀態 166
+    function_invocation  進入狀態 34
+    data                 進入狀態 35
+
+
+狀態 164
+
+   47 loop: FOR ID ':' const_expr '.' • '.' const_expr block_or_statement
+
+    '.'  偏移，並進入狀態 167
+
+
+狀態 165
+
+   44 conditional: IF boolean_expr THEN block_or_statement ELSE • block_or_statement
+
+    INT           偏移，並進入狀態 22
+    REAL          偏移，並進入狀態 23
+    STRING_Dump   偏移，並進入狀態 24
+    BOOLEAN_Dump  偏移，並進入狀態 25
+    ID            偏移，並進入狀態 94
+    NOT           偏移，並進入狀態 27
+    STRING        偏移，並進入狀態 28
+    VAR           偏移，並進入狀態 4
+    CONST         偏移，並進入狀態 5
+    BEGIN         偏移，並進入狀態 126
+    EXIT          偏移，並進入狀態 96
+    FOR           偏移，並進入狀態 97
+    GET           偏移，並進入狀態 98
+    IF            偏移，並進入狀態 99
+    LOOP          偏移，並進入狀態 100
+    PUT           偏移，並進入狀態 101
+    RESULT        偏移，並進入狀態 102
+    RETURN        偏移，並進入狀態 103
+    SKIP          偏移，並進入狀態 104
+    FALSE         偏移，並進入狀態 29
+    TRUE          偏移，並進入狀態 30
+    '['           偏移，並進入狀態 31
+    '-'           偏移，並進入狀態 32
+
+    block_except_brace   進入狀態 127
+    block_content        進入狀態 106
+    declaration          進入狀態 107
+    const                進入狀態 11
+    var                  進入狀態 12
+    array                進入狀態 13
+    statements           進入狀態 128
+    conditional          進入狀態 109
+    loop                 進入狀態 110
+    expression           進入狀態 111
+    function_invocation  進入狀態 34
+    block_or_statement   進入狀態 168
+    data                 進入狀態 35
+
+
+狀態 166
+
+   34 statements: ID '[' expression ']' '=' expression •
+   49 expression: expression • OR expression
+   50           | expression • AND expression
+   52           | expression • '-' expression
+   53           | expression • '+' expression
+   54           | expression • '/' expression
+   55           | expression • '*' expression
+   56           | expression • REMAINDER expression
+
+    REMAINDER  偏移，並進入狀態 56
+    AND        偏移，並進入狀態 57
+    OR         偏移，並進入狀態 58
+    '-'        偏移，並進入狀態 59
+    '+'        偏移，並進入狀態 60
+    '/'        偏移，並進入狀態 61
+    '*'        偏移，並進入狀態 62
+
+    '-'       [使用規則 34 以縮減 (statements)]
+    $default  使用規則 34 以縮減 (statements)
+
+
+狀態 167
+
+   47 loop: FOR ID ':' const_expr '.' '.' • const_expr block_or_statement
+
+    INT   偏移，並進入狀態 152
+    REAL  偏移，並進入狀態 153
+
+    const_expr  進入狀態 169
+
+
+狀態 168
+
+   44 conditional: IF boolean_expr THEN block_or_statement ELSE block_or_statement •
+
+    $default  使用規則 44 以縮減 (conditional)
+
+
+狀態 169
+
+   47 loop: FOR ID ':' const_expr '.' '.' const_expr • block_or_statement
+
+    INT           偏移，並進入狀態 22
+    REAL          偏移，並進入狀態 23
+    STRING_Dump   偏移，並進入狀態 24
+    BOOLEAN_Dump  偏移，並進入狀態 25
+    ID            偏移，並進入狀態 94
+    NOT           偏移，並進入狀態 27
+    STRING        偏移，並進入狀態 28
+    VAR           偏移，並進入狀態 4
+    CONST         偏移，並進入狀態 5
+    BEGIN         偏移，並進入狀態 126
+    EXIT          偏移，並進入狀態 96
+    FOR           偏移，並進入狀態 97
+    GET           偏移，並進入狀態 98
+    IF            偏移，並進入狀態 99
+    LOOP          偏移，並進入狀態 100
+    PUT           偏移，並進入狀態 101
+    RESULT        偏移，並進入狀態 102
+    RETURN        偏移，並進入狀態 103
+    SKIP          偏移，並進入狀態 104
+    FALSE         偏移，並進入狀態 29
+    TRUE          偏移，並進入狀態 30
+    '['           偏移，並進入狀態 31
+    '-'           偏移，並進入狀態 32
+
+    block_except_brace   進入狀態 127
+    block_content        進入狀態 106
+    declaration          進入狀態 107
+    const                進入狀態 11
+    var                  進入狀態 12
+    array                進入狀態 13
+    statements           進入狀態 128
+    conditional          進入狀態 109
+    loop                 進入狀態 110
+    expression           進入狀態 111
+    function_invocation  進入狀態 34
+    block_or_statement   進入狀態 170
+    data                 進入狀態 35
+
+
+狀態 170
+
+   47 loop: FOR ID ':' const_expr '.' '.' const_expr block_or_statement •
+
+    $default  使用規則 47 以縮減 (loop)
