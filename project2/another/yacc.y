@@ -30,7 +30,7 @@ string temp_funtion_name = "";
 %token <boolVal> BOOLEAN_Dump
 %token <stringVal> ID
 %token LP RP DOT COMMA COLON SEMICOLON LSB RSB LCB RCB ADDITION SUBTRACTION MULTIPLICATION DIVISION REMAINDER ASSIGNMENT LT LE GE GT EQ NOTE AND OR NOT
-%token BOOL STRING VAR ARRAY CONST BEGIN CHAR DECREASING DEFAULT DO ELSE END EXIT FOR FUNCTION GET IF LOOP OF PUT PROCEDURE RESULT RETURN SKIP THEN WHEN FALSE TRUE
+%token BOOL STRING VAR ARRAY CONST BEG CHAR DECREASING DEFAULT DO ELSE END EXIT FOR FUNCTION GET IF LOOP OF PUT PROCEDURE RESULT RETURN SKIP THEN WHEN FALSE TRUE
 
 
 /* Operators */
@@ -242,7 +242,7 @@ statements: ID ASSIGNMENT expression {
     ;
 
 //blocks
-blocks: BEGIN block_or_statement END;
+blocks: BEG block_or_statement END;
 //Conditional
 conditional: IF boolean_expr THEN block_or_statement ELSE block_or_statement END IF
     |   IF boolean_expr THEN block_or_statement END IF
