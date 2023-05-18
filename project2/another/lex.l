@@ -1,10 +1,9 @@
 %{
-    extern int yylex(void);
+    
     #include <stdio.h>
-    #include <string.h>
+    #include <string>
     #include <math.h>
     #include <iostream>
-    #include <sstream>
     #include <string>
     #include "y.tab.h"
     #define LIST     strcat(buf,yytext)
@@ -20,11 +19,11 @@
     char buf[MAX_LENGTH];
     string str_temp;
     char stringBuf[MAX_LENGTH];
+    int yylex(void);
 %}
 /* states */
-%x	STATE_string
-%x 	COMMET_Cpp
-%x	COMMET_C
+%x	STR
+%x 	COMMENT
 
 digs         [0-9]
 integer      {digs}+
@@ -39,133 +38,142 @@ whitespace   [ \t]+
 
 /*delimiter   \,|\:|\;|\(|\)|\[|\]|\{|\}*/
 /*Arithmetic, Relational, and Logical Operators*/
-/*ARL  \+|\-|\*|\/|%|\<|<=|>=|\>|==|!=|&|\||!|\=|\+=|\-=|\*=|\/=*/
-/*keyword bool|break|char|case|class|continue|declare|do|else|exit|float|for|fun|if|int|loop|print|println|return|string|val|var|while*/
+/*ARL  \+|\-|\*|\/|%|\<|<=|>=|\>|=|&|\||
+/*keyword bool|char|do|else|exit|for|function|if|int|loop|put|return|string|const|var|*/
 
 
 %%
-
- /*delimiter*/
-"." 		{token('.'); return(DOT);} 
-"," 		{token(','); return(COMMA);}
-":" 		{token(':'); return(COLON);}
-";" 		{token(';'); return(SEMICOLON);}
-"(" 		{token('('); return(LP);}
-")" 		{token(')'); return(RP);}
-"[" 		{token('['); return(LSB);}
-"]" 		{token(']'); return(RSB);}
-"{" 		{token('{'); return(LCB);}
-"}" 		{token('}'); return(RCB);}
- /*ARL*/
-"+" 		{token('+'); return(ADDITION);}
-"-" 		{token('-'); return(SUBTRACTION);}
-"*" 		{token('*'); return(MULTIPLICATION);}
-"/" 		{token('/'); return(DIVISION);}
-"mod" 		{token('mod'); return(REMAINDER);} 
-":=" 		{token(':='); return(ASSIGNMENT);}
-"<"		{token('<'); return(LT);}
-"<="		{token('<='); return(LE);}
-">="		{token('>='); return(GE);}
-">"		{token('>'); return(GT);}
-"="		{token('='); return(EQ);}
-"not="		{token('not=');return(NOTE);}
-"and"		{token('and'); return(AND);}
-"or"		{token('or'); return(OR);}
-"not"		{token('not'); return(NOT);}
-
- /* keyword */
-"array"		{token(ARRAY); return(ARRAY);}
-"begin" 	{token(BEGIN); return(BEGIN);} 
-"bool" 		{token(BOOL); return BOOL;}
-"char" 		{token(CHAR); return(CHAR);}
-"const"	 	{token(CONST); return(CONST);}
-"decreasing" 	{token(DECREASING); return(DECREASING);}
-"default" 	{token(DEFAULT); return(DEFAULT);}
-"do" 		{token(DO); return(DO);}
-"else" 		{token(ELSE); return(ELSE);}
-"end"		{token(END); return(END);}
-"exit" 		{token(EXIT); return(EXIT);}
-"for" 		{token(FOR); return(FOR);}//for loop
-"function" 	{token(FUNCTION); return(FUNCTION);}
-"if" 		{token(IF); return(IF);}
-"int" 		{token(INT); return(INT);}
-"loop" 		{token(LOOP); return(LOOP);}//while loop
-"of" 		{token(OF); return(OF);}
-"put" 		{token(PUT); return(PUT);}
-"procedure" 	{token(PROCEDURE); return(PROCEDURE);}
-"real" 		{token(REAL); return(REAL);}
-"result" 	{token(RESULT); return(RESULT);}
-"return" 	{token(RETURN); return(RETURN);}
-"skip" 		{token(SKIP); return(SKIP);}
-"string" 	{token(STRING); return(STRING);}
-"then" 		{token(THEN); return(THEN);}
-"var" 		{token(VAR); return(VAR);}
-"when" 		{token(WHEN); return(WHEN);}
-
 {integer} {tokenInteger("Integer",atoi(yytext));}
 {real} {tokenReal("Real",atof(yytext));}
-{boolean} {tokenBoolean("Boolen",yytext);}
+
+ /*delimiter*/
+"." 		{token('.'); return yytext[0];} 
+"," 		{token(','); return yytext[0];}
+":" 		{token(':'); return yytext[0];}
+";" 		{token(';'); return yytext[0];}
+"(" 		{token('('); return yytext[0];}
+")" 		{token(')'); return yytext[0];}
+"[" 		{token('['); return yytext[0];}
+"]" 		{token(']'); return yytext[0];}
+"{" 		{token('{'); return yytext[0];}
+"}" 		{token('}'); return yytext[0];}
+ /*ARL*/
+"+" 		{token('+'); return yytext[0];}
+"-" 		{token('-'); return yytext[0];}
+"*" 		{token('*'); return yytext[0];}
+"/" 		{token('/'); return yytext[0];}
+"mod" 		{token('mod'); return REMAINDER;} 
+":=" 		{token(':='); return ASSIGNMENT;}
+"<"		{token('<'); return LT;}
+"<="		{token('<='); return LE;}
+">="		{token('>='); return GE;}
+">"		{token('>'); return GT;}
+"="		{token('='); return EQ;}
+"not="		{token('not=');return NOTE;}
+"and"		{token('and'); return AND;}
+"or"		{token('or'); return OR;}
+"not"		{token('not'); return NOT;}
+
+ /* keyword */
+"array"		{token(ARRAY); return ARRAY;}
+"begin" 	{token(BEGIN);  return BEGIN;} 
+"bool" 		{token(BOOL); return BOOL;}
+"char" 		{token(CHAR); return CHAR;}
+"const"	 	{token(CONST); return CONST;}
+"decreasing" 	{token(DECREASING); return DECREASING;}
+"default" 	{token(DEFAULT); return DEFAULT;}
+"do" 		{token(DO); return DO;}
+"else" 		{token(ELSE); return ELSE;}
+"end"		{token(END); return END;}
+"exit" 		{token(EXIT); return EXIT;}
+"for" 		{token(FOR); return FOR;}//for loop
+"function" 	{token(FUNCTION); return FUNCTION;}
+"if" 		{token(IF); return IF;}
+"int" 		{token(INT); return INT;}
+"loop" 		{token(LOOP); return LOOP;}//while loop
+"of" 		{token(OF); return OF;}
+"put" 		{token(PUT); return PUT;}
+"procedure" 	{token(PROCEDURE); return PROCEDURE;}
+"real" 		{token(REAL); return REAL;}
+"result" 	{token(RESULT); return RESULT;}
+"return" 	{token(RETURN); return RETURN;}
+"bool" 		{token(BOOL); return BOOL;}
+"skip" 		{token(SKIP); return SKIP;}
+"string" 	{token(STRING); return STRING;}
+"then" 		{token(THEN); return THEN;}
+"var" 		{token(VAR); return VAR;}
+"when" 		{token(WHEN); return WHEN;}
+
+
+
+{boolean} {tokenBoolean("Boolean",yytext);}
 {identifier} {tokenID("ID",yytext); }
 
-\"		  {
-                    LIST;
-                    BEGIN STATE_string;
-                  }
+\"  { 
+    LIST;
+    BEGIN(STR); 
+    
+}
+<STR>\\n { 
+    LIST; 
+    strcat(stringBuf, "\n");
+}
+<STR>\\t { 
+    LIST; 
+    strcat(stringBuf, "\t");
+}
+<STR>\"\"    { 
+    LIST; 
+    strcat(stringBuf, "\"");
+}
+<STR>\"  { 
+    BEGIN(INITIAL);
+    strcat(stringBuf, "\0");
+    tokenString("String",stringBuf);
+    stringBuf[0] = '\0';
+}
+<STR>\n  { 
+    LIST; 
+    printf("bad character:\\n\n"); 
+    exit(-1); 
+}
+<STR>[^\"]* {
+    LIST; 
+    strcat(stringBuf, yytext);
+}
 
-<STATE_string>\"  {
-                      char c = input;
-                      if (c == '\"') {
-                      LIST;
-                      strcat(buf,"\"");
-                      strcat(str,yytext);
-                    }
-                      else{
-                      tokenString("string",stringBuf);
-                      unput(c);
-                      stringBuf[0] = '\0';
-                      BEGIN 0;
-                      return STRING;
-                    }
-                    }
-<STATE_string>.     {
-                      LIST;
-                      strcat(str,yytext);
-                    }
-"%"          		{
-               		LIST;
-                	BEGIN COMMET_Cpp;
-            		}
-<COMMET_Cpp>\n 	{
-                      LIST;
-                      printf("%d: %s", line_num++, buf);
-                      buf[0] = '\0';
-                      BEGIN 0;
-                    }
-<COMMET_Cpp>.    {
-                      LIST;
-                    }
-"{%"               {
-                      LIST;
-                      BEGIN COMMET_C;
-                    }
-<COMMET_C>\n {
-                      LIST;
-                      printf("%d: %s", line_num++, buf);
-                      buf[0] = '\0';
-                     	}
-<COMMET_C>"%}"	{
-                      		LIST;
-                      		BEGIN 0;
-                    	}
-<COMMET_C>.     {
-                      		LIST;
-                    	}
-\n 			{
-        		LIST;
-        		printf("%d: %s", line_num++, buf);
-        		buf[0] = '\0';
-        		}
-[ \t]*  		{LIST;}
+"%".*    {LIST;}
+
+"{%" {
+    BEGIN(COMMENT);
+    LIST;
+}
+<COMMENT>"%}"    {
+    BEGIN(INITIAL);
+    LIST;
+}
+<COMMENT>"\n"   {
+    LIST;
+    printf("%d: %s", linenum++, buf);
+    buf[0] = '\0';
+}
+<COMMENT>[*]*   {LIST;}
+<COMMENT>[^*/\n]* {LIST;}
+
+\n      {
+        LIST;
+        printf("%d: %s", linenum++, buf);
+        buf[0] = '\0';
+        }
+
+[ \t]*  {LIST;}
+
+.       {
+        LIST;
+        printf("%d:%s\n", linenum+1, buf);
+        printf("bad character:'%s'\n",yytext);
+        exit(-1);
+        }
 
 %%
 int yywrap(void){
