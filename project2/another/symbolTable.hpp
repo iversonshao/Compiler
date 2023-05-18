@@ -10,20 +10,21 @@ enum DataType{
     rEAL,
     bOOL,
     sTRING,
-    vOID
+    vOID,
+    aRRAY
 };
 
 struct ID{
-    int const_var_array_function = 0; // 1: const, 2: var, 3: array 4: function
+    int const_var_array_function_prod = 0; // 1: const, 2: var, 3: array 4: function 5: procedure
     string name;               // identifier's name
     int data_type;
     ID(){
-        const_var_array_function = 0;
+        const_var_array_function_prod = 0;
         name = "";
         data_type = iNT;
     }
     ID(int vvaf, const char *s, int type){
-        const_var_array_function = vvaf;
+        const_var_array_function_prod = vvaf;
         name = s;
         data_type = type;
     }
@@ -108,26 +109,35 @@ void dump()
             {
                 temp_data_type = "VOID";
             }
+            else if (iter_table->id[i].data_type == aRRAY)
+            {
+                temp_data_type = "ARRAY";
+            }
 
-            if (iter_table->id[i].const_var_array_function == 1)
+            if (iter_table->id[i].const_var_array_function_prod == 1)
             {
                 cout << i << ": " << iter_table->id[i].name << " "
                      << "  constant  " << temp_data_type << endl;
             }
-            else if (iter_table->id[i].const_var_array_function == 2)
+            else if (iter_table->id[i].const_var_array_function_prod == 2)
             {
                 cout << i << ": " << iter_table->id[i].name << " "
                      << "  variable  " << temp_data_type << endl;
             }
-            else if (iter_table->id[i].const_var_array_function == 3)
+            else if (iter_table->id[i].const_var_array_function_prod == 3)
             {
                 cout << i << ": " << iter_table->id[i].name << " "
                      << "  array  " << temp_data_type << endl;
             }
-            else if (iter_table->id[i].const_var_array_function == 4)
+            else if (iter_table->id[i].const_var_array_function_prod == 4)
             {
                 cout << i << ": " << iter_table->id[i].name << " "
                      << "  function  " << temp_data_type << endl;
+            }
+            else if (iter_table->id[i].const_var_array_function_prod == 5)
+            {
+                cout << i << ": " << iter_table->id[i].name << " "
+                     << "  procedure  " << temp_data_type << endl;
             }
         }
         iter_table = iter_table->next;
