@@ -1,11 +1,11 @@
 CC = g++
-TARGET = p2
+TARGET = parser
 .PHONY: all clean
 
 all: $(TARGET)
 
 $(TARGET): lex.yy.c y.tab.c 
-	$(CC) y.tab.c -ll -ly -std=c++11 -p $(TARGET)
+	$(CC) y.tab.c -ll -std=c++11 -o $(TARGET)
 	#mv a.out parser
 lex.yy.c: lex.l
 	flex -o lex.yy.c lex.l
