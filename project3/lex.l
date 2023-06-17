@@ -8,10 +8,10 @@
     #include "y.tab.h"
     #define LIST     strcat(buf,yytext)
     #define token(t) {LIST; printf("<%s>\n",#t);}
-    #define tokenInteger(t,i) {LIST; printf("<%s:%d>\n",t,i); yylval.intVal = i; return(INT);}
-    #define tokenReal(t,r) {LIST; printf("<%s:%f>\n",t,r); yylval.realVal = r; return(REAL);}
-    #define tokenBoolean(t,b) {LIST; printf("<%s:%s>\n",t,b); yylval.boolVal = yytext; return(BOOLEAN_Dump);}
-    #define tokenString(t,s) {LIST; printf("<%s:%s>\n",t,s); yylval.stringVal = strdup(s); return (STRING_Dump);}
+    #define tokenInteger(t,i) {LIST; printf("<%s:%d>\n",t,i); yylval.intVal = i; return(INT_VALUE);}
+    #define tokenReal(t,r) {LIST; printf("<%s:%f>\n",t,r); yylval.realVal = r; return(REAL_VALUE);}
+    #define tokenBoolean(t,b) {LIST; printf("<%s:%s>\n",t,b); yylval.boolVal = yytext; return(BOOLEAN_VALUE);}
+    #define tokenString(t,s) {LIST; printf("<%s:%s>\n",t,s); yylval.stringVal = strdup(s); return (STRING_VALUE);}
     #define tokenID(t,i) {LIST; printf("<%s:%s>\n",t,i); yylval.stringVal = strdup(i); return(ID);}
     #define MAX_LENGTH 256
     using namespace std;
@@ -32,10 +32,10 @@ expreal      {digs}"."{digs}[Ee][+-]?{digs}
 real         {plainreal}|{expreal}
 letter       [a-zA-Z]
 identifier   {letter}+({digs}|{letter})*
-boolean       true|false
 string	     [0-9a-zA-Z]*
 whitespace   [ \t]+
 
+/*boolean       true|false*/
 /*delimiter   \,|\:|\;|\(|\)|\[|\]|\{|\}*/
 /*Arithmetic, Relational, and Logical Operators*/
 /*ARL  \+|\-|\*|\/|%|\<|<=|>=|\>|=|&|\||
@@ -75,39 +75,38 @@ whitespace   [ \t]+
 "not"		{token('not'); return NOT;}
 
  /* keyword */
-"array"		{token(ARRAY); return ARRAY;}
-"begin" 	{token(BEGIN);  return BEGIN;} 
-"bool" 		{token(BOOL); return BOOL;}
-"char" 		{token(CHAR); return CHAR;}
-"const"	 	{token(CONST); return CONST;}
-"decreasing" 	{token(DECREASING); return DECREASING;}
-"default" 	{token(DEFAULT); return DEFAULT;}
-"do" 		{token(DO); return DO;}
-"else" 		{token(ELSE); return ELSE;}
-"end"		{token(END); return END;}
-"exit" 		{token(EXIT); return EXIT;}
-"for" 		{token(FOR); return FOR;}//for loop
-"function" 	{token(FUNCTION); return FUNCTION;}
-"if" 		{token(IF); return IF;}
-"int" 		{token(INT); return INT;}
-"loop" 		{token(LOOP); return LOOP;}//while loop
-"of" 		{token(OF); return OF;}
-"put" 		{token(PUT); return PUT;}
-"procedure" 	{token(PROCEDURE); return PROCEDURE;}
-"real" 		{token(REAL); return REAL;}
-"result" 	{token(RESULT); return RESULT;}
-"return" 	{token(RETURN); return RETURN;}
-"bool" 		{token(BOOL); return BOOL;}
-"skip" 		{token(SKIP); return SKIP;}
-"string" 	{token(STRING); return STRING;}
-"then" 		{token(THEN); return THEN;}
-"var" 		{token(VAR); return VAR;}
-"when" 		{token(WHEN); return WHEN;}
+"array"		{token(ARRAY); return(ARRAY);}
+"begin" 	{token(BEG);  return(BEG);} 
+"bool" 		{token(BOOL); return(BOOL);}
+"char" 		{token(CHAR); return(CHAR);}
+"const"	 	{token(CONST); return(CONST);}
+"decreasing" 	{token(DECREASING); return(DECREASING);}
+"default" 	{token(DEFAULT); return(DEFAULT);}
+"do" 		{token(DO); return(DO);}
+"else" 		{token(ELSE); return(ELSE);}
+"end"		{token(END); return(END);}
+"exit" 		{token(EXIT); return(EXIT);}
+"for" 		{token(FOR); return(FOR);}//for loop
+"function" 	{token(FUNCTION); return(FUNCTION);}
+"if" 		{token(IF); return(IF);}
+"int" 		{token(INT); return(INT);}
+"loop" 		{token(LOOP); return(LOOP);}//while loop
+"of" 		{token(OF); return(OF);}
+"put" 		{token(PUT); return(PUT);}
+"procedure" 	{token(PROCEDURE); return(PROCEDURE);}
+"real" 		{token(REAL); return(REAL);}
+"result" 	{token(RESULT); return(RESULT);}
+"return" 	{token(RETURN); return(RETURN);}
+"bool" 		{token(BOOL); return(BOOL);}
+"skip" 		{token(SKIP); return(SKIP);}
+"string" 	{token(STRING); return(STRING);}
+"then" 		{token(THEN); return(THEN);}
+"var" 		{token(VAR); return(VAR);}
+"when" 		{token(WHEN); return(WHEN);}
+"true"		{token(TRUE); return(TRUE);}
+"false"		{token(FALUSE); return(FALSE);}
 
-
-
-{boolean} {tokenBoolean("Boolean",yytext);}
-{identifier} {tokenID("ID",yytext); }
+{identifier} 	{tokenID("ID",yytext); }
 
 \"  { 
     LIST;
@@ -133,8 +132,9 @@ whitespace   [ \t]+
     	//cout << stringBuf[i];
     	str_temp[i] = stringBuf[i];
     }
-    tokenString("String",str_temp);
     stringBuf[0] = '\0';
+    tokenString("String",str_temp);
+    
 }
 <STR>\n  { 
     LIST; 
@@ -174,13 +174,9 @@ whitespace   [ \t]+
 
 .       {
         LIST;
-        printf("%d:%s\n", linenum+1, buf);
+        printf("%d:%s\n", linenum + 1, buf);
         printf("bad character:'%s'\n",yytext);
         exit(-1);
         }
 
 %%
-int yywrap(void){
-	puts("---the file is end");
-	return 1;
-}
