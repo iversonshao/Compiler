@@ -41,7 +41,7 @@ bool bool_value = true;
 %token <boolVal> TRUE FALSE //BOOLEAN_Dump
 %token <stringVal> ID
 %token LP RP DOT COMMA COLON SEMICOLON LSB RSB LCB RCB ADDITION SUBTRACTION MULTIPLICATION DIVISION REMAINDER ASSIGNMENT LT LE GE GT EQ NOTE AND OR NOT
-%token BOOL STRING VAR ARRAY CONST BEGIN GET CHAR DECREASING DEFAULT DO ELSE END EXIT FOR FUNCTION IF LOOP OF PUT PROCEDURE RESULT RETURN SKIP THEN WHEN
+%token BOOL STRING VAR ARRAY CONST BEG GET CHAR DECREASING DEFAULT DO ELSE END EXIT FOR FUNCTION IF LOOP OF PUT PROCEDURE RESULT RETURN SKIP THEN WHEN
 
 
 /* Operators */
@@ -708,8 +708,8 @@ function_invocation_not_void: ID '(' function_arguments ')' {
             fileJasm << "invokestatic " << "boolean " << head -> id[0].name << "." << temp_id.name << "(";
         }
         for(int i = 0; i < function_arguments_type.size();i++){
-            if(fuction_function_arguments_type[i][0] == temp_id.name){
-                fileJasm << fuction_function_arguments_type[i][1] << ")" << endl;
+            if(function_arguments_type[i][0] == temp_id.name){
+                fileJasm << function_arguments_type[i][1] << ")" << endl;
             }
         }
     }            
@@ -761,7 +761,7 @@ boolean_expr: expression '<' expression {
     }
     ;
 
-block_or_statement: BEGIN block_except_brace END | block_except_brace_only_one_line;
+block_or_statement: BEG block_except_brace END | block_except_brace_only_one_line;
 block_except_brace_only_one_line: block_content;
 
 type:   INT     {$$ = iNT;}
