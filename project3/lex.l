@@ -76,7 +76,7 @@ whitespace   [ \t]+
 
  /* keyword */
 "array"		{token(ARRAY); return ARRAY;}
-"begin" 	{token(BEG);  return BEG;} 
+"begin" 	{token(BEGIN);  return BEGIN;} 
 "bool" 		{token(BOOL); return BOOL;}
 "char" 		{token(CHAR); return CHAR;}
 "const"	 	{token(CONST); return CONST;}
