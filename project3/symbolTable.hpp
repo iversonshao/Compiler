@@ -38,8 +38,8 @@ struct ID{
         boool = true;
         str = "";
     }
-    ID(int vvaf, const char *s, int type, int inte, bool booool, string stri){
-        const_var_array_function_prod = vvaf;
+    ID(int cvafp, const char *s, int type, int inte, bool booool, string stri){
+        const_var_array_function_prod = cvafp;
         name = s;
         data_type = type;
         
@@ -96,8 +96,8 @@ ID lookup(const char *s){
     return ID(0, "", iNT, 0, true, "");
 }
 
-void insert(int vvaf, const char *s, int type, int integer, bool boool, string str){
-    ID newID = ID(vvaf, s, type, integer, boool, str);
+void insert(int cvafp, const char *s, int type, int integer, bool boool, string str){
+    ID newID = ID(cvafp, s, type, integer, boool, str);
     cur_table -> id.push_back(newID);
 }
 
