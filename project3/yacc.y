@@ -13,11 +13,10 @@ extern int linenum;
 #include"symbolTable.hpp"
 using namespace std;
 ID temp_id;
-string temp_funtion_name = "";
+string temp_function_name = "";
 
 string function_arguments_temp = "";
-vector <vector<string>> 
-function_arguments_type;
+vector <vector<string>> function_arguments_type;
 
 //data_value
 int int_value = 0;
@@ -40,7 +39,7 @@ bool bool_value = true;
 %token <stringVal> STRING_VALUE //STRING_Dump
 %token <boolVal> TRUE FALSE //BOOLEAN_Dump
 %token <stringVal> ID
-%token LP RP DOT COMMA COLON SEMICOLON LSB RSB LCB RCB ADDITION SUBTRACTION MULTIPLICATION DIVISION REMAINDER ASSIGNMENT LT LE GE GT EQ NOTE AND OR NOT
+%token ADDITION SUBTRACTION MULTIPLICATION DIVISION REMAINDER ASSIGNMENT LT LE GE GT EQ NOTE AND OR NOT POINT
 %token BOOL STRING VAR ARRAY CONST BEG GET CHAR DECREASING DEFAULT DO ELSE END EXIT FOR FUNCTION IF LOOP OF PUT PROCEDURE RESULT RETURN SKIP THEN WHEN
 
 
@@ -57,30 +56,47 @@ bool bool_value = true;
 %type <dataType> data_value //data
 %type <dataType> expression boolean_expr
 
-%start program
 //%token SEMICOLON
 %%
 /*Program Units*/
 //Start symbol
-program: {
+start: {
 	create();
+	insert(4, "example", vOID, 0, true, "");
+	fileJasm << "class example" << endl << "{" << endl;
     }
-    any_content
+    any_content { fileJasm << "}"; }
     ;
 
 any_content: any_declaration | any_content any_declaration;
-any_declaration: declaration | functions | procedures;
+any_declaration: declaration | functions | procedures | statements;
 
 //Functions
 functions: FUNCTION ID '(' {
         insert(4, $2, vOID, 0, true, ""); //predict function return type is vOID
         create();
-        temp_funtion_name = $2;
+        temp_function_name = $2;
     }
         function_contents{ 
             temp_id = lookup($2); 
             if (temp_id.data_type == vOID){// vOID 4
-            	tab(cur_table -> layer +1);
+            	tab(cur_table -> layer + 1);
+            	fileJasm << "return" << endl;
+            }
+            tab(cur_table -> layer);
+            fileJasm << "}" << endl;
+            
+            dump();
+            cur_table = cur_table -> previous; //scope handling
+    }
+    |	ID ASSIGNMENT function_invocation_not_void {
+    	insert(4, "main", vOID, 0, true, "");
+    	create();
+    	temp_function_name = "main";
+    }
+        function_contents{  
+            if (temp_id.data_type == vOID){// vOID 4
+            	tab(cur_table -> layer + 1);
             	fileJasm << "return" << endl;
             }
             tab(cur_table -> layer);
@@ -90,41 +106,68 @@ functions: FUNCTION ID '(' {
             cur_table = cur_table -> previous; //scope handling
     }
     ;
+/*    
+main : {
+	tab(cur_table->layer);
+	fileJasm << "method public static ";
+	fileJasm << "void main"<< "(" << "java.lang.String[]";
+	fileJasm << ")\n";
+        tab(cur_table->layer);
+        fileJasm << "max_stack 15\n";
+        tab(cur_table->layer);
+        fileJasm << "max_locals 15\n";
+    }
+    |  ID ASSIGNMENT function_invocation_not_void{
+    	tab(cur_table->layer+1);
+	fileJasm << "method public static ";
+	fileJasm << "void main"<< "(" << "java.lang.String[]";
+	fileJasm << ")\n";
+        tab(cur_table->layer+1);
+        fileJasm << "max_stack 15\n";
+        tab(cur_table->layer+1);
+        fileJasm << "max_locals 15\n";   
+    }
+    ;
+*/
 function_contents: {
 	tab(cur_table -> layer);
 	fileJasm << "method public static ";
-	if(temp_funtion_name == "main"){
-		fileJasm << "void " << temp_funtion_name << "(" << "java.lang.String[]";
+	if(temp_function_name == "main"){
+		fileJasm << "void " << temp_function_name << "(" << "java.lang.String[]";
 	}
-    } function_arguments_contents function_contents
+	else if(temp_function_name == " "){
+		fileJasm << "void main" << "(" << "java.lang.String[]";
+	}
+    } function_arguments_contents function_content
     ;	
-function_contents: ' '{ 
-    tab(cur_table -> layer);
-    fileJasm << " \n";
+function_content: { 
+    	tab(cur_table -> layer);
+    	fileJasm << "{\n";
     } END ID
-    | ' ' {
-    tab(cur_table -> layer);
-    fileJasm << " \n";
+    |  	{
+    	tab(cur_table -> layer);
+    	fileJasm << "{\n";
     } block_except_brace END ID
     ;
-    
-function_arguments_contents: ')' ':' type {
-	if (temp_funtion_name != "main"){
-		fileJasm << "void " << temp_funtion_name << "("; 
+	     
+function_arguments_contents: ')' {
+        if(temp_function_name != "main"){
+            fileJasm << "void " << temp_function_name << "(";
         }
+        
         fileJasm << ")\n";
-        tab(cur_table -> layer);
+        tab(cur_table->layer);
         fileJasm << "max_stack 15\n";
-        tab(cur_table -> layer);
-        fileJasm << "max_locals 15\n";
+        tab(cur_table->layer);
+        fileJasm << "max_locals 15\n"; 
     }
     |   formal_arguments ')' { 
-    	if(temp_funtion_name != "main"){
-    		fileJasm << "void" << temp_funtion_name << "(";
+    	if(temp_function_name != "main"){
+    		fileJasm << "void" << temp_function_name << "(";
     	}
     	fileJasm << function_arguments_temp;
     	vector<string> string_temp;
-    	string_temp.push_back(temp_funtion_name);
+    	string_temp.push_back(temp_function_name);
     	string_temp.push_back(function_arguments_temp);
     	function_arguments_type.push_back(string_temp);
     	function_arguments_temp.clear();
@@ -140,14 +183,14 @@ function_arguments_contents: ')' ':' type {
         SymbolTable* iter_table = head;
         while (iter_table != NULL) {
             for (int i = 0; i < iter_table -> id.size(); i++) {
-                if (iter_table -> id[i].name == temp_funtion_name) {
-                    cur_table -> id[i].data_type = $3;
+                if (iter_table -> id[i].name == temp_function_name) {
+                    iter_table -> id[i].data_type = $3;
                 }
             }
             iter_table = iter_table -> next;
         }
         
-        temp_id = find(temp_funtion_name);
+        temp_id = find(temp_function_name);
         if (temp_id.name != ""){
         	if (temp_id.data_type == vOID){
         		fileJasm << "void ";
@@ -162,7 +205,7 @@ function_arguments_contents: ')' ':' type {
         		yyerror((char*)"Function return type error.");
         	}
         }
-        fileJasm << temp_funtion_name << "(";
+        fileJasm << temp_function_name << "(";
         
         fileJasm << ")\n";
         tab(cur_table -> layer);
@@ -175,14 +218,14 @@ function_arguments_contents: ')' ':' type {
         SymbolTable* iter_table = head;
         while (iter_table != NULL) {
             for (int i = 0; i < iter_table -> id.size(); i++) {
-                if (iter_table -> id[i].name == temp_funtion_name) {
-                    cur_table -> id[i].data_type = $4;
+                if (iter_table -> id[i].name == temp_function_name) {
+                    iter_table -> id[i].data_type = $4;
                 }
             }
             iter_table = iter_table -> next;
         }
         
-        temp_id = find (temp_funtion_name);
+        temp_id = find (temp_function_name);
         if (temp_id.name != ""){
         	if (temp_id.data_type == vOID){
         		fileJasm << "void ";
@@ -197,11 +240,11 @@ function_arguments_contents: ')' ':' type {
         		yyerror((char*)"Function return type error.");
         	}
         }   
-        fileJasm << temp_funtion_name << "(";
+        fileJasm << temp_function_name << "(";
 
         fileJasm << function_arguments_temp;
         vector<string> string_temp;
-        string_temp.push_back(temp_funtion_name);
+        string_temp.push_back(temp_function_name);
         string_temp.push_back(function_arguments_temp);
         function_arguments_type.push_back(string_temp);
         function_arguments_temp.clear();
@@ -236,32 +279,40 @@ arguments:  ID ':' type {
 procedures: PROCEDURE ID '(' {
         insert(5 , $2, vOID, 0, true, ""); //predict procedures return type is vOID
         create();
-        temp_funtion_name = $2;
+        temp_function_name = $2;
     }
         procedure_contents{ 
+            temp_id = lookup($2);
+            if(temp_id.data_type == vOID){ //vOID 4
+                tab(cur_table->layer + 1);
+                fileJasm << "return" << endl;
+            }
+            tab(cur_table->layer);
+            fileJasm << "}" << endl;           
+            
             dump(); 
             cur_table = cur_table -> previous; //scope handling
     }
     ;
-procedure_contents: procedure_arguments_contents ' ' END ID
-    |   procedure_arguments_contents ' ' block_except_brace END ID
+procedure_contents: procedure_arguments_contents  END ID
+    |   procedure_arguments_contents  block_except_brace END ID
     ;
     
 procedure_arguments_contents: ')' { }
     |   formal_arguments ')' { }
-formal_arguments:  ID ':' type { insert(2, $1, $3, 0, true, ""); } 
-    |    formal_arguments ',' ID ':' type { insert(2, $3, $5, 0, true, ""); }	 
+	formal_arguments:  ID ':' type { insert(2, $1, $3, 0, true, ""); } 
+    |   formal_arguments ',' ID ':' type { insert(2, $3, $5, 0, true, ""); }	 
     ;
 /*Block*/
 //block
-block_except_brace: block_content | block_content block_except_brace;
+block_except_brace: block_content |  block_except_brace block_content;
 
 block_content: declaration 
     |	statements 
     |	expression
-    |	RETURN expression {
+    |	RESULT expression {
         //expression & function type checking
-        temp_id = find(temp_funtion_name);
+        temp_id = find(temp_function_name);
         if(temp_id.data_type == vOID){
             yyerror((char*)"Function return type is void.");
         }
@@ -271,8 +322,8 @@ block_content: declaration
         tab(cur_table -> layer + 1);
         fileJasm << "ireturn" << endl;
     }
-    |   RETURN {
-        temp_id = find(temp_funtion_name);
+    |   RESULT {
+        temp_id = find(temp_function_name);
         if(temp_id.data_type != vOID){
             yyerror((char*)"Function return type is not void.");
         }
@@ -284,7 +335,21 @@ block_content: declaration
 /*declaration*/
 declaration:    const|var|array;
 //Constants
-const: CONST ID ':' type ASSIGNMENT expression {
+const:	CONST ID ASSIGNMENT expression {
+        if($4 == 0){
+            insert(1, $2, $4, int_value, true, "");
+        }
+        else if($4 == 2){
+            insert(1, $2, $4, 0, bool_value, "");
+        }
+        else if($4 == 3){
+            insert(1, $2, $4, 0, true, string_value);
+        }
+        else {
+            yyerror((char*)"Declaration data type error.");
+        }
+    }
+    |	CONST ID ':' type ASSIGNMENT expression {
         //cout << "-----TYPE: " << $4 << " EXPRESSION TYPE: " << $6 << endl;
         if($4 != $6){
             yyerror((char*)"Declaration data type error.");
@@ -435,7 +500,7 @@ var: VAR ID {
     }
     ;
 //Arrays
-array: VAR ID ':' ARRAY INT '.''.' INT OF type{
+array: VAR ID ':' ARRAY INT POINT INT OF type{
         insert(3, $2, ARRAY, 0, true, "");
     }
     ;
@@ -460,6 +525,23 @@ statements: ID ASSIGNMENT expression {
         }
         if(temp_id.const_var_array_function_prod == 1){
             yyerror((char*)"Constant can't be change.");
+        }
+    }
+    |   ID '(' function_arguments ')' {
+        temp_id = lookup($1);
+        if(temp_id.name == ""){
+            yyerror((char*)"Identify didn't declare yet.");
+        }
+        if(temp_id.data_type != vOID){
+            yyerror((char*)"Function return type is not void.");
+        }
+        tab(cur_table->layer + 1);
+        fileJasm << "invokestatic " << "void " << head->id[0].name << "." << temp_id.name << "(";
+
+        for(int i = 0; i < function_arguments_type.size(); i++){
+            if(function_arguments_type[i][0] == temp_id.name){
+                fileJasm << function_arguments_type[i][1] << ")" << endl;
+            }
         }
     }
     |   PUT {
@@ -490,6 +572,7 @@ statements: ID ASSIGNMENT expression {
     /*
     |   EXIT
     |	EXIT WHEN boolean_expr
+   
     |   RESULT expression {
         //expression & function type checking
         if (cur_table != nullptr){
@@ -512,7 +595,7 @@ statements: ID ASSIGNMENT expression {
                 }
             }
 	}
-    }
+    } 
     */
     |   loop
     |   conditional
@@ -525,7 +608,7 @@ conditional: IF '(' boolean_expr ')' THEN only_if  block_or_statement END IF {
         fileJasm << "Lfalse" << if_else_counter << ":" << endl;
         if_else_counter = if_else_counter + 1;
     }
-    |	IF '('boolean_expr')' THEN only_if  block_or_statement ELSE have_else block_or_statement END IF {
+    |	IF '('boolean_expr')' THEN only_if block_or_statement ELSE have_else block_or_statement  END IF {
 	tab(cur_table -> layer);
         fileJasm << "Lexit" << if_else_counter << ":" << endl;
         if_else_counter = if_else_counter + 1;
@@ -550,25 +633,24 @@ loop: LOOP {
         fileJasm << "Lbegin_loop" << while_counter << ":" << endl;
     } EXIT WHEN '(' boolean_expr ')' {
 	tab (cur_table -> layer + 1);
-	fileJasm << "ifeq Lexit_loop" << while_counter << endl;
-    } block_or_statement {
+	fileJasm << "ifne Lexit_loop" << while_counter << endl;
+    } block_or_statement LOOP{
         tab(cur_table -> layer + 1);
         fileJasm << "goto Lbegin_loop" << while_counter << endl;
         tab(cur_table -> layer);
         fileJasm << "Lexit_loop" << while_counter << ":" << endl;
-    } END LOOP
+    }
     |   FOR ID ':' INT_VALUE{
-    	insert(2, $2, $4, 0, true, "");
-    	//insert (2, $3, iNT, $5, true, "");
+    	insert (2, $2, iNT, $4, true, "");
     	tab (cur_table -> layer + 1);
     	fileJasm << "sipush " << $4 << endl;
     	putstatic_istore($2);
-    } '.' '.' INT_VALUE {
+    }  '.' '.' INT_VALUE {
         tab (cur_table -> layer);
         fileJasm << "Lbegin_for" << for_counter << ":" << endl;
         getstatic_iload_sipush_iconst_ldc($2);
         tab (cur_table -> layer + 1);
-        fileJasm << "sipush " << $8 << endl;
+        fileJasm << "sipush "  << $8 << endl;
         if($8 > $4){
             boolean_expr_reduce("ifgt");
             tab(cur_table -> layer + 1);
@@ -579,7 +661,7 @@ loop: LOOP {
             tab(cur_table -> layer + 1);
             fileJasm << "ifne Lexit" << for_counter << endl;
         }    	
-    }block_or_statement {
+    }  block_or_statement FOR{
     	getstatic_iload_sipush_iconst_ldc($2);
     	tab (cur_table -> layer + 1);
         fileJasm << "sipush 1" << endl;
@@ -597,11 +679,11 @@ loop: LOOP {
         fileJasm << "Lexit" << for_counter << ":" << endl;
         for_counter = for_counter + 1;
         delete_ID($2);
-    } END FOR
+    } 
     ;
 
 //expressions
-expression: '[' expression ']' {$$ = $2;}
+expression: ' ' expression ' ' {$$ = $2;}
 	/*
     |   expression OR expression {
     	boolean_expr_reduce ("ior")
@@ -717,6 +799,7 @@ function_invocation_not_void: ID '(' function_arguments ')' {
 function_arguments: expression
     |   function_arguments ',' expression
     ;
+
 procedure_invocation: ID '(' procedure_arguments ')' {
         temp_id = lookup($1);
         if(temp_id.name == ""){
@@ -727,6 +810,7 @@ procedure_invocation: ID '(' procedure_arguments ')' {
 procedure_arguments: expression
     |   procedure_arguments ',' expression
     ;
+ 
 boolean_expr: expression '<' expression {
 	boolean_expr_reduce("iflt");
     }
@@ -745,15 +829,15 @@ boolean_expr: expression '<' expression {
     |   expression NOTE expression {
     	boolean_expr_reduce("ifne");
     }
-    |   expression '|' expression {
+    |   expression AND expression {
         tab(cur_table->layer + 1);
         fileJasm << "ior" << endl;
     }
-    |   expression '&' expression{
+    |   expression OR expression{
         tab(cur_table->layer + 1);
         fileJasm << "iand" << endl;
     }
-    |   '!' expression {
+    |   NOT expression {
         tab(cur_table -> layer + 1);
         fileJasm << "iconst_1" << endl;
         tab(cur_table -> layer + 1);
