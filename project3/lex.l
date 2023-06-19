@@ -47,32 +47,31 @@ whitespace   [ \t]+
 {real} {tokenReal("Real",atof(yytext));}
 
  /*delimiter*/
-"." 		{token('.'); return yytext[0];} 
-"," 		{token(','); return yytext[0];}
-":" 		{token(':'); return yytext[0];}
-";" 		{token(';'); return yytext[0];}
-"(" 		{token('('); return yytext[0];}
-")" 		{token(')'); return yytext[0];}
-"[" 		{token('['); return yytext[0];}
-"]" 		{token(']'); return yytext[0];}
-"{" 		{token('{'); return yytext[0];}
-"}" 		{token('}'); return yytext[0];}
+"." 		{token('.'); return('.');} 
+"," 		{token(','); return(',');}
+":" 		{token(':'); return(':');}
+";" 		{token(';'); return(';');}
+"(" 		{token('('); return('(');}
+")" 		{token(')'); return(')');}
+"[" 		{token('['); return('[');}
+"]" 		{token(']'); return(']');}
  /*ARL*/
-"+" 		{token('+'); return yytext[0];}
-"-" 		{token('-'); return yytext[0];}
-"*" 		{token('*'); return yytext[0];}
-"/" 		{token('/'); return yytext[0];}
-"mod" 		{token('mod'); return REMAINDER;} 
-":=" 		{token(':='); return ASSIGNMENT;}
-"<"		{token('<'); return LT;}
-"<="		{token('<='); return LE;}
-">="		{token('>='); return GE;}
-">"		{token('>'); return GT;}
-"="		{token('='); return EQ;}
-"not="		{token('not=');return NOTE;}
-"and"		{token('and'); return AND;}
-"or"		{token('or'); return OR;}
-"not"		{token('not'); return NOT;}
+"+" 		{token('+'); return('+');}
+"-" 		{token('-'); return('-');}
+"*" 		{token('*'); return('*');}
+"/" 		{token('/'); return('/');}
+"mod" 		{token("mod"); return(REMAINDER);} 
+":=" 		{token(":="); return(ASSIGNMENT);}
+"<"		{token('<'); return('<');}
+"<="		{token("<="); return(LE);}
+">="		{token(">="); return(GE);}
+">"		{token('>'); return('>');}
+"="		{token('='); return(EQ);}
+"not="		{token("not=");return(NOTE);}
+"and"		{token("and"); return(AND);}
+"or"		{token("or"); return(OR);}
+"not"		{token("not"); return(NOT);}
+".." 		{token(".."); return(POINT);}
 
  /* keyword */
 "array"		{token(ARRAY); return(ARRAY);}
@@ -97,14 +96,13 @@ whitespace   [ \t]+
 "real" 		{token(REAL); return(REAL);}
 "result" 	{token(RESULT); return(RESULT);}
 "return" 	{token(RETURN); return(RETURN);}
-"bool" 		{token(BOOL); return(BOOL);}
 "skip" 		{token(SKIP); return(SKIP);}
 "string" 	{token(STRING); return(STRING);}
 "then" 		{token(THEN); return(THEN);}
 "var" 		{token(VAR); return(VAR);}
 "when" 		{token(WHEN); return(WHEN);}
 "true"		{token(TRUE); return(TRUE);}
-"false"		{token(FALUSE); return(FALSE);}
+"false"		{token(FALSE); return(FALSE);}
 
 {identifier} 	{tokenID("ID",yytext); }
 
