@@ -69,7 +69,7 @@ start: {
     ;
 
 any_content: any_declaration | any_content any_declaration;
-any_declaration: declaration | functions | procedures | statements;
+any_declaration: declaration | functions block_except_brace;
 
 //Functions
 functions: FUNCTION ID '(' {
@@ -89,54 +89,12 @@ functions: FUNCTION ID '(' {
             dump();
             cur_table = cur_table -> previous; //scope handling
     }
-    |	ID ASSIGNMENT function_invocation_not_void {
-    	insert(4, "main", vOID, 0, true, "");
-    	create();
-    	temp_function_name = "main";
-    }
-        function_contents{  
-            if (temp_id.data_type == vOID){// vOID 4
-            	tab(cur_table -> layer + 1);
-            	fileJasm << "return" << endl;
-            }
-            tab(cur_table -> layer);
-            fileJasm << "}" << endl;
-            
-            dump();
-            cur_table = cur_table -> previous; //scope handling
-    }
     ;
-/*    
-main : {
-	tab(cur_table->layer);
-	fileJasm << "method public static ";
-	fileJasm << "void main"<< "(" << "java.lang.String[]";
-	fileJasm << ")\n";
-        tab(cur_table->layer);
-        fileJasm << "max_stack 15\n";
-        tab(cur_table->layer);
-        fileJasm << "max_locals 15\n";
-    }
-    |  ID ASSIGNMENT function_invocation_not_void{
-    	tab(cur_table->layer+1);
-	fileJasm << "method public static ";
-	fileJasm << "void main"<< "(" << "java.lang.String[]";
-	fileJasm << ")\n";
-        tab(cur_table->layer+1);
-        fileJasm << "max_stack 15\n";
-        tab(cur_table->layer+1);
-        fileJasm << "max_locals 15\n";   
-    }
-    ;
-*/
 function_contents: {
 	tab(cur_table -> layer);
 	fileJasm << "method public static ";
 	if(temp_function_name == "main"){
 		fileJasm << "void " << temp_function_name << "(" << "java.lang.String[]";
-	}
-	else if(temp_function_name == " "){
-		fileJasm << "void main" << "(" << "java.lang.String[]";
 	}
     } function_arguments_contents function_content
     ;	
@@ -275,7 +233,7 @@ arguments:  ID ':' type {
 	}	
     }
     ;
-//procedures
+/*procedures
 procedures: PROCEDURE ID '(' {
         insert(5 , $2, vOID, 0, true, ""); //predict procedures return type is vOID
         create();
@@ -303,6 +261,7 @@ procedure_arguments_contents: ')' { }
 	formal_arguments:  ID ':' type { insert(2, $1, $3, 0, true, ""); } 
     |   formal_arguments ',' ID ':' type { insert(2, $3, $5, 0, true, ""); }	 
     ;
+*/
 /*Block*/
 //block
 block_except_brace: block_content |  block_except_brace block_content;
@@ -517,16 +476,31 @@ statements: ID ASSIGNMENT expression {
             yyerror((char*)"Constant can't be change.");
         }
     }
-    |   ID ASSIGNMENT function_invocation_not_void {
-    	putstatic_istore($1);
-        temp_id = lookup($1);
-        if(temp_id.name == ""){
-            yyerror((char*)"Identify didn't declare yet.");
-        }
-        if(temp_id.const_var_array_function_prod == 1){
-            yyerror((char*)"Constant can't be change.");
-        }
-    }
+    |   ID ASSIGNMENT function_invocation_not_void {  
+    
+        insert(4, "main", vOID, 0, true, ""); //predict function return type is vOID
+        create();
+        temp_function_name = "main";
+    }    
+        function_contents{ 
+            tab(cur_table -> layer + 1);
+            fileJasm << "return" << endl;
+            tab(cur_table -> layer);
+            fileJasm << "}" << endl;
+            dump();
+            cur_table = cur_table -> previous; //scope handling
+    	
+
+       		putstatic_istore($1);
+       		temp_id = lookup($1);
+
+        	if(temp_id.name == ""){
+            		yyerror((char*)"Identify didn't declare yet.");
+        	}	
+        	if(temp_id.const_var_array_function_prod == 1){
+            		yyerror((char*)"Constant can't be change.");
+    		}
+    } function_arguments_contents function_content       
     |   ID '(' function_arguments ')' {
         temp_id = lookup($1);
         if(temp_id.name == ""){
@@ -608,7 +582,7 @@ conditional: IF '(' boolean_expr ')' THEN only_if  block_or_statement END IF {
         fileJasm << "Lfalse" << if_else_counter << ":" << endl;
         if_else_counter = if_else_counter + 1;
     }
-    |	IF '('boolean_expr')' THEN only_if block_or_statement ELSE have_else block_or_statement  END IF {
+    |	IF '(' boolean_expr ')' THEN only_if block_or_statement ELSE have_else block_or_statement  END IF {
 	tab(cur_table -> layer);
         fileJasm << "Lexit" << if_else_counter << ":" << endl;
         if_else_counter = if_else_counter + 1;
@@ -755,7 +729,8 @@ expression: ' ' expression ' ' {$$ = $2;}
     |   STRING_Dump {$$ = sTRING;}
     |   BOOLEAN_Dump {$$ = bOOL;} 
     */
-    |   data_value
+    |   data_value    
+    |	function_invocation_not_void
     //|   const_expr
     |   ID {
         temp_id = lookup($1);
@@ -769,7 +744,6 @@ expression: ' ' expression ' ' {$$ = $2;}
             $$ = temp_id.data_type;
         }
     }
-    //|	function_invocation
     ;
 
 //function invocation
@@ -781,7 +755,16 @@ function_invocation_not_void: ID '(' function_arguments ')' {
         if (temp_id.data_type == vOID){
             yyerror((char*)"Function return type is void.");
         }
-        
+        /*
+        tab (cur_table -> layer + 1);
+        fileJasm << "method public static ";
+        fileJasm << "void main" << "(java.lang.String[]";
+        fileJasm << ")\n";
+        tab(cur_table->layer+1);
+        fileJasm << "max_stack 15\n";
+        tab(cur_table->layer+1);
+        fileJasm << "max_locals 15\n";
+	*/
         tab (cur_table -> layer + 1);
         if (temp_id.data_type == 0){
             fileJasm << "invokestatic " << "int " << head -> id[0].name << "." << temp_id.name << "(";
@@ -794,12 +777,13 @@ function_invocation_not_void: ID '(' function_arguments ')' {
                 fileJasm << function_arguments_type[i][1] << ")" << endl;
             }
         }
+    
     }            
     ;
 function_arguments: expression
     |   function_arguments ',' expression
     ;
-
+/*
 procedure_invocation: ID '(' procedure_arguments ')' {
         temp_id = lookup($1);
         if(temp_id.name == ""){
@@ -810,7 +794,7 @@ procedure_invocation: ID '(' procedure_arguments ')' {
 procedure_arguments: expression
     |   procedure_arguments ',' expression
     ;
- 
+*/ 
 boolean_expr: expression '<' expression {
 	boolean_expr_reduce("iflt");
     }
